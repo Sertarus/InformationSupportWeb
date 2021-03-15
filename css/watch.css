@@ -1,0 +1,11 @@
+div.parent {
+	text-align: left;
+	}
+ul { 
+	display: inline-block; 
+	text-align: left;
+	list-style: none; 
+	}
+li {
+	margin: 10px 0;
+}
