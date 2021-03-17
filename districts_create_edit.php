@@ -95,7 +95,7 @@ if (isset($_POST['addButton'])) {
               <a class="nav-link active" aria-current="page" href="main_page.php">Список активных сотрудников</a>
             </li>
             <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Изменение информации в системе</a>
+            <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Изменение информации о системе</a>
               <ul class="dropdown-menu text-center" aria-labelledby="dropdown01">
               <li><a class="dropdown-item" href="services.php">Службы</a></li>
               <li><a class="dropdown-item" href="districts.php">Районы</a></li>

@@ -9,15 +9,27 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 }
 if (isset($_POST['addButton'])) {
         	session_start();
-        	header("location: devices_create_edit.php?isEdit=0");
+        	header("location: objects_create_edit.php?isEdit=0");
         }
 if (isset($_POST['deleteButton'])) {
 	require_once "config.php";
-	$sql = "delete from devices where deleted = 1";
+	$sql = "delete from dataobjects where deleted = 1";
 	if ($stmt = oci_parse($link, $sql)) {
 	if (!oci_execute($stmt)) {
 		echo "Произошла непредвиденная ошибка";
 	}
+}
+$sql = "delete from recordvalues where deleted = 1";
+  if ($stmt = oci_parse($link, $sql)) {
+  if (!oci_execute($stmt)) {
+    echo "Произошла непредвиденная ошибка";
+  }
+}
+$sql = "delete from recordtypes where deleted = 1";
+  if ($stmt = oci_parse($link, $sql)) {
+  if (!oci_execute($stmt)) {
+    echo "Произошла непредвиденная ошибка";
+  }
 }
 }
 ?>
@@ -26,11 +38,11 @@ if (isset($_POST['deleteButton'])) {
 
   <head>
     <meta charset="UTF-8">
-    <title>Устройства</title>
+    <title>Объекты данных</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="fontawesome/css/all.css">
     <script src="js/jquery-3.6.0.min.js"></script>
-    <script src="js/devices.js?2"></script>
+    <script src="js/objects.js?2"></script>
     <style type="text/css">
       body {
         font: 14px sans-serif;
@@ -42,7 +54,7 @@ if (isset($_POST['deleteButton'])) {
   <body>
     <nav class="navbar navbar-dark bg-dark" aria-label="First navbar example">
       <div class="container-fluid">
-        <a class="navbar-brand" href="devices.php">Устройства</a>
+        <a class="navbar-brand" href="objects.php">Объекты данных</a>
         <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarsExample01" aria-controls="navbarsExample01" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -72,25 +84,53 @@ if (isset($_POST['deleteButton'])) {
         </div>
       </div>
     </nav>
+
     <form method="post">
-                <input type="submit" class="btn btn-outline-primary" value="Добавить устройство" style="float: right;" name="addButton">
+                <input type="submit" class="btn btn-outline-primary" value="Добавить объект данных" style="float: right;" name="addButton">
                 <?php if ($_SESSION["role"] == 2) echo "<input type='submit' class='btn btn-outline-danger' value='Удалить объекты с пометкой на удаление' style='float: left;' name='deleteButton'>"; ?>
             </form>
-    <table id="devices_table" class="table table-bordered table-hover">
+    <table id="objects_table" class="table table-bordered table-hover">
       <?php
         require_once "config.php";
-        $sql = "select d.name, d.createdby, TO_CHAR(d.creationdate, 'DD.MM.YYYY HH24:MI:SS') as creationdate, u.login as creator_login, u.service as creatorservice, u.district as creatordistrict from devices d join users u on u.iduser = d.createdby where d.deleted = '0'";
+        $sql = "select d.name, branch, b.name as branchname, d.createdby, TO_CHAR(d.creationdate, 'DD.MM.YYYY HH24:MI:SS') as creationdate, u.login as creator_login from dataobjects d join users u on u.iduser = d.createdby left join branches b on b.idbranch = d.branch where d.deleted = '0'";
         $stmt = oci_parse($link, $sql);
         oci_define_by_name($stmt, 'NAME', $name);
-        oci_define_by_name($stmt, 'CREATORSERVICE', $creator_service);
-        oci_define_by_name($stmt, 'CREATORDISTRICT', $creator_district);
+        oci_define_by_name($stmt, 'BRANCH', $branch);
+        oci_define_by_name($stmt, 'BRANCHNAME', $branch_name);
         oci_define_by_name($stmt, 'CREATOR_LOGIN', $creator);
         oci_define_by_name($stmt, 'CREATIONDATE', $creationdate);
         if (oci_execute($stmt)) {
             if (oci_fetch($stmt)) {
+              $is_service_in = false;
+              $is_district_in = false;
+              $serv_sql = "select * from branches_services where branch = :p1 and service = :p2 and deleted = '0'";
+              $serv_stmt = oci_parse($link, $serv_sql);
+              oci_bind_by_name($serv_stmt, ':p1', $branch);
+              oci_bind_by_name($serv_stmt, ':p2', $_SESSION["service"]);
+              if (oci_execute($serv_stmt)) {
+                if (oci_fetch($serv_stmt)) {
+                  $is_service_in = true;
+                }
+              }
+              else {
+                echo "Произошла непредвиденная ошибка";
+              }
+              $dist_sql = "select * from branches_districts where branch = :p1 and district = :p2 and deleted = '0'";
+              $dist_stmt = oci_parse($link, $dist_sql);
+              oci_bind_by_name($dist_stmt, ':p1', $branch);
+              oci_bind_by_name($dist_stmt, ':p2', $_SESSION["district"]);
+              if (oci_execute($dist_stmt)) {
+                if (oci_fetch($dist_stmt)) {
+                  $is_district_in = true;
+                }
+              }
+              else {
+                echo "Произошла непредвиденная ошибка";
+              }
             echo "<thead>".
         "<tr class ='active'>".
         "<th>Название</th>".
+        "<th>Ветка</th>".
         "<th>Создавший пользователь</th>".
         "<th>Дата создания</th>".
         "<th>Действия</th>".
@@ -99,21 +139,49 @@ if (isset($_POST['deleteButton'])) {
         "<tbody>".
         "<tr>".
         "<td class='name'>". $name . "</td>".
+        "<td>". $branch_name . "</td>".
         "<td>". $creator . "</td>".
         "<td>" . $creationdate  . "</td>".
-        "<td><button type='button' class='btn btn-primary'><i class='far fa-eye'></i></button>		";
-        if ($_SESSION["role"] == 2 || ($_SESSION["service"] == $creator_service && $_SESSION["district"] == $creator_district)){
+        "<td><button type='button' class='btn btn-primary'><i class='far fa-eye'></i></button>    ";
+        if ($_SESSION["role"] == 2 || ($is_service_in && $is_district_in)){
           echo "<button type='button' class='btn btn-success'><i class='fas fa-edit'></i></button>  ".
         "<button type='button' class='btn btn-danger'><i class='fa fa-trash'></i></button></td>";
         }
         echo "</tr>";
         while (oci_fetch($stmt)) {
+          $is_service_in = false;
+              $is_district_in = false;
+              $serv_sql = "select * from branches_services where branch = :p1 and service = :p2 and deleted = '0'";
+              $serv_stmt = oci_parse($link, $serv_sql);
+              oci_bind_by_name($serv_stmt, ':p1', $branch);
+              oci_bind_by_name($serv_stmt, ':p2', $_SESSION["service"]);
+              if (oci_execute($serv_stmt)) {
+                if (oci_fetch($serv_stmt)) {
+                  $is_service_in = true;
+                }
+              }
+              else {
+                echo "Произошла непредвиденная ошибка";
+              }
+              $dist_sql = "select * from branches_districts where branch = :p1 and district = :p2 and deleted = '0'";
+              $dist_stmt = oci_parse($link, $dist_sql);
+              oci_bind_by_name($dist_stmt, ':p1', $branch);
+              oci_bind_by_name($dist_stmt, ':p2', $_SESSION["district"]);
+              if (oci_execute($dist_stmt)) {
+                if (oci_fetch($dist_stmt)) {
+                  $is_district_in = true;
+                }
+              }
+              else {
+                echo "Произошла непредвиденная ошибка";
+              }
             echo "<tr>".
-        "<td class='name'>". $name . "</td>".
+        "<td class='name'>". $name . "</td>";
+        echo "<td>". $branch_name . "</td>".
         "<td>". $creator . "</td>".
         "<td>" . $creationdate . "</td>".
         "<td><button type='button' class='btn btn-primary'><i class='far fa-eye'></i></button>    ";
-        if ($_SESSION["role"] == 2 || ($_SESSION["service"] == $creator_service && $_SESSION["district"] == $creator_district)){
+        if ($_SESSION["role"] == 2 || ($is_service_in && $is_district_in)){
           echo "<button type='button' class='btn btn-success'><i class='fas fa-edit'></i></button>  ".
         "<button type='button' class='btn btn-danger'><i class='fa fa-trash'></i></button></td>";
         }
@@ -125,7 +193,7 @@ if (isset($_POST['deleteButton'])) {
         else {
             echo "<tbody>".
         "<tr>".
-        "<td>На данный момент не создано ни одного устройства</td>".
+        "<td>На данный момент не создано ни одной ветки</td>".
         "</tr>".
         "</tbody>".
         "</table>";

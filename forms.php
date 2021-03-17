@@ -65,7 +65,7 @@ $sql = "delete from recordtypes where deleted = 1";
               <a class="nav-link active" aria-current="page" href="main_page.php">Список активных сотрудников</a>
             </li>
             <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Изменение информации в системе</a>
+            <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Изменение информации о системе</a>
               <ul class="dropdown-menu text-center" aria-labelledby="dropdown01">
               <li><a class="dropdown-item" href="services.php">Службы</a></li>
               <li><a class="dropdown-item" href="districts.php">Районы</a></li>
@@ -91,10 +91,12 @@ $sql = "delete from recordtypes where deleted = 1";
     <table id="forms_table" class="table table-bordered table-hover">
       <?php
         require_once "config.php";
-        $sql = "select name, ishuman, d.createdby, TO_CHAR(d.creationdate, 'DD.MM.YYYY HH24:MI:SS') as creationdate, u.login as creator_login from datatypes d join users u on u.iduser = d.createdby where d.deleted = '0'";
+        $sql = "select name, ishuman, d.createdby, TO_CHAR(d.creationdate, 'DD.MM.YYYY HH24:MI:SS') as creationdate, u.login as creator_login, u.service, u.district from datatypes d join users u on u.iduser = d.createdby where d.deleted = '0'";
         $stmt = oci_parse($link, $sql);
         oci_define_by_name($stmt, 'NAME', $name);
         oci_define_by_name($stmt, 'ISHUMAN', $is_human);
+        oci_define_by_name($stmt, 'SERVICE', $service);
+        oci_define_by_name($stmt, 'DISTRICT', $district);
         oci_define_by_name($stmt, 'CREATOR_LOGIN', $creator);
         oci_define_by_name($stmt, 'CREATIONDATE', $creationdate);
         if (oci_execute($stmt)) {
@@ -120,10 +122,12 @@ $sql = "delete from recordtypes where deleted = 1";
         echo "<td>". $is_human_string . "</td>".
         "<td>". $creator . "</td>".
         "<td>" . $creationdate  . "</td>".
-        "<td><button type='button' class='btn btn-primary'><i class='far fa-eye'></i></button>		".
-        "<button type='button' class='btn btn-success'><i class='fas fa-edit'></i></button>	".
-        "<button type='button' class='btn btn-danger'><i class='fa fa-trash'></i></button></td>".
-        "</tr>";
+        "<td><button type='button' class='btn btn-primary'><i class='far fa-eye'></i></button>    ";
+        if ($_SESSION["role"] == 2 || ($_SESSION["service"] == $service && $_SESSION["district"] == $district)){
+          echo "<button type='button' class='btn btn-success'><i class='fas fa-edit'></i></button>  ".
+        "<button type='button' class='btn btn-danger'><i class='fa fa-trash'></i></button></td>";
+        }
+        echo "</tr>";
         while (oci_fetch($stmt)) {
             echo "<tr>".
         "<td class='name'>". $name . "</td>";
@@ -136,10 +140,12 @@ $sql = "delete from recordtypes where deleted = 1";
         echo "<td>". $is_human_string . "</td>".
         "<td>". $creator . "</td>".
         "<td>" . $creationdate . "</td>".
-        "<td><button type='button' class='btn btn-primary'><i class='far fa-eye'></i></button>		".
-        "<button type='button' class='btn btn-success'><i class='fas fa-edit'></i></button>	".
-        "<button type='button' class='btn btn-danger'><i class='fa fa-trash'></i></button></td>".
-        "</tr>";
+        "<td><button type='button' class='btn btn-primary'><i class='far fa-eye'></i></button>    ";
+        if ($_SESSION["role"] == 2 || ($_SESSION["service"] == $service && $_SESSION["district"] == $district)){
+          echo "<button type='button' class='btn btn-success'><i class='fas fa-edit'></i></button>  ".
+        "<button type='button' class='btn btn-danger'><i class='fa fa-trash'></i></button></td>";
+        }
+        echo "</tr>";
         }
         echo "</tbody>".
         "</table>";

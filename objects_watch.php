@@ -29,7 +29,7 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
   <body>
     <nav class="navbar navbar-dark bg-dark" aria-label="First navbar example">
       <div class="container-fluid">
-        <a class="navbar-brand" href="branches.php">Назад</a>
+        <a class="navbar-brand" href="objects.php">Назад</a>
         <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarsExample01" aria-controls="navbarsExample01" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -63,28 +63,31 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
   </body>
   <?php
   require_once "config.php";
-  $sql = "select b.name, d.name as datatype, br.name as higherbranch, b.createdby, TO_CHAR(b.creationdate, 'DD.MM.YYYY HH24:MI:SS') as creationdate, b.changedby, TO_CHAR(b.changeddate, 'DD.MM.YYYY HH24:MI:SS') as changeddate, u.login as createdbyname, us.login as changedbyname from branches b left join users u on u.iduser = b.createdby left join users us on us.iduser = b.changedby left join datatypes d on d.iddatatype = b.datatype left join branches br on br.idbranch = b.higherbranch where b.name = :p1 and b.deleted = '0'";
+  $sql = "select d.iddataobject, d.image, d.name, d.branch as branchid, b.name as branch, d.createdby, TO_CHAR(d.creationdate, 'DD.MM.YYYY HH24:MI:SS') as creationdate, d.changedby, TO_CHAR(d.changeddate, 'DD.MM.YYYY HH24:MI:SS') as changeddate, u.login as createdbyname, us.login as changedbyname from dataobjects d left join users u on u.iduser = d.createdby left join users us on us.iduser = d.changedby left join branches b on b.idbranch = d.branch where d.name = :p1 and d.deleted = '0'";
+  $dataobject_id = "";
   if ($stmt = oci_parse($link, $sql)) {
     oci_bind_by_name($stmt, ':p1', $_GET["name"]);
+    oci_define_by_name($stmt, 'IDDATAOBJECT', $id);
     oci_define_by_name($stmt, 'NAME', $name);
-    oci_define_by_name($stmt, 'DATATYPE', $datatype);
-    oci_define_by_name($stmt, 'HIGHERBRANCH', $higherbranch);
+    oci_define_by_name($stmt, 'IMAGE', $image);
+    oci_define_by_name($stmt, 'BRANCH', $branch);
+    oci_define_by_name($stmt, 'BRANCHID', $branch_id);
     oci_define_by_name($stmt, 'CREATEDBYNAME', $createdby);
     oci_define_by_name($stmt, 'CREATIONDATE', $creationdate);
     oci_define_by_name($stmt, 'CHANGEDBYNAME', $changedby);
     oci_define_by_name($stmt, 'CHANGEDDATE', $changeddate);
     if (oci_execute($stmt)) {
       oci_fetch($stmt);
-      if (is_null($higherbranch)) {
-          $branch_string = "-";
-        }
-        else {
-          $branch_string = $higherbranch;
-        }
+      $dataobject_id = $id;
+      if (!is_null($image)) {
+        echo "<div class='row m-2'><div class='col-sm-auto m-2'>";
+        echo '<img src="data:image/jpeg;base64,'.base64_encode($image -> load()).'" width ="300" height="300"/>';
+        echo "</div>";
+      }
+      echo "<div class = 'col'>";
       echo "<div class='parent'><ul>".
        "<li><b>Название: </b>" . $name. "</li>" . 
-       "<li><b>Находится в ветке: </b>" . $branch_string. "</li>" .
-       "<li><b>Привязанная форма заполнения: </b>" . $datatype. "</li>" . 
+       "<li><b>Находится в ветке: </b>" . $branch. "</li>" .
       "<li><b>Создавший пользователь: </b>" . $createdby. "</li>" .
       "<li><b>Дата создания: </b>" . $creationdate . "</li>";
       if (!is_null($changedby) && !is_null($changeddate)) {
@@ -97,35 +100,44 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     }
     oci_free_statement($stmt);
   }
-  $sql = "select s.name as service from branches_services bs left join services s on s.idservice = bs.service where bs.deleted = '0' and branch in (select idbranch from branches where deleted = '0' and name =:p1) order by s.name";
-  echo "<br><li>Привязанные службы:</li>";
+  $datatype_id = "";
+  $sql = "select datatype from branches where deleted = '0' and idbranch = :p1";
   if ($stmt = oci_parse($link, $sql)) {
-    oci_bind_by_name($stmt, ':p1', $_GET["name"]);
-    oci_define_by_name($stmt, 'SERVICE', $service);
+    oci_bind_by_name($stmt, ':p1', $branch_id);
+    oci_define_by_name($stmt, 'DATATYPE', $datatype);
     if (oci_execute($stmt)) {
-      $counter = 1;
-      while (oci_fetch($stmt)) {
-        echo "<li><b>Служба ". $counter . ": </b>" . $service . "</li>";
-        $counter++;
+      if (oci_fetch($stmt)) {
+        $datatype_id = $datatype;
       }
     }
     else {
       echo "Произошла непредвиденная ошибка";
     }
-    oci_free_statement($stmt);
   }
-  $sql = "select d.name as district from branches_districts bd left join districts d on d.iddistrict = bd.district where bd.deleted = '0' and branch in (select idbranch from branches where deleted = '0' and name =:p1) order by d.name";
-  echo "<br><li>Привязанные Районы:</li>";
+  $sql = "select recordtype, r.name, dataorder, dr.deleted from datatypes_recordtypes dr join recordtypes r on r.idrecordtype = dr.recordtype where datatype = :p1 and dr.deleted = '0' order by dataorder";
+  echo "<br><li>Форма объекта:</li>";
   if ($stmt = oci_parse($link, $sql)) {
-    oci_bind_by_name($stmt, ':p1', $_GET["name"]);
-    oci_define_by_name($stmt, 'DISTRICT', $district);
+    oci_bind_by_name($stmt, ':p1', $datatype_id);
+    oci_define_by_name($stmt, 'RECORDTYPE', $recordtype);
+    oci_define_by_name($stmt, 'NAME', $recordtype_name);
     if (oci_execute($stmt)) {
-      $counter = 1;
       while (oci_fetch($stmt)) {
-        echo "<li><b>Район ". $counter . ": </b>" . $district . "</li>";
-        $counter++;
+        $rec_sql = "select value from recordvalues where recordtype = :p1 and dataobject = :p2 and deleted = '0'";
+        if ($rec_stmt = oci_parse($link, $rec_sql)) {
+          oci_bind_by_name($rec_stmt, ':p1', $recordtype);
+          oci_bind_by_name($rec_stmt, ':p2', $dataobject_id);
+          oci_define_by_name($rec_stmt, 'VALUE', $value);
+          if (oci_execute($rec_stmt)) {
+            if (oci_fetch($rec_stmt)) {
+              echo "<li><b>" . $recordtype_name . ": </b>" . $value . "</li>";
+            }
+          }
+          else {
+            echo "Произошла непредвиденная ошибка";
+          }
+        }
       }
-      echo "</ul></div>";
+      echo "</ul></div></div></div>";
     }
     else {
       echo "Произошла непредвиденная ошибка";

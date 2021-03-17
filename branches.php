@@ -65,7 +65,7 @@ $sql = "delete from branches_services where deleted = 1";
               <a class="nav-link active" aria-current="page" href="main_page.php">Список активных сотрудников</a>
             </li>
             <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Изменение информации в системе</a>
+            <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Изменение информации о системе</a>
               <ul class="dropdown-menu text-center" aria-labelledby="dropdown01">
               <li><a class="dropdown-item" href="services.php">Службы</a></li>
               <li><a class="dropdown-item" href="districts.php">Районы</a></li>
@@ -84,6 +84,7 @@ $sql = "delete from branches_services where deleted = 1";
         </div>
       </div>
     </nav>
+
     <form method="post">
                 <input type="submit" class="btn btn-outline-primary" value="Добавить форму" style="float: right;" name="addButton">
                 <?php if ($_SESSION["role"] == 2) echo "<input type='submit' class='btn btn-outline-danger' value='Удалить объекты с пометкой на удаление' style='float: left;' name='deleteButton'>"; ?>
@@ -91,8 +92,9 @@ $sql = "delete from branches_services where deleted = 1";
     <table id="branches_table" class="table table-bordered table-hover">
       <?php
         require_once "config.php";
-        $sql = "select b.name, d.name as datatype, br.name as higherbranch, b.createdby, TO_CHAR(b.creationdate, 'DD.MM.YYYY HH24:MI:SS') as creationdate, u.login as creator_login from branches b join users u on u.iduser = b.createdby join datatypes d on d.iddatatype = b.datatype left join branches br on br.idbranch = b.higherbranch where b.deleted = '0'";
+        $sql = "select b.idbranch, b.name, d.name as datatype, br.name as higherbranch, b.createdby, TO_CHAR(b.creationdate, 'DD.MM.YYYY HH24:MI:SS') as creationdate, u.login as creator_login from branches b join users u on u.iduser = b.createdby join datatypes d on d.iddatatype = b.datatype left join branches br on br.idbranch = b.higherbranch where b.deleted = '0'";
         $stmt = oci_parse($link, $sql);
+        oci_define_by_name($stmt, 'IDBRANCH', $id);
         oci_define_by_name($stmt, 'NAME', $name);
         oci_define_by_name($stmt, 'DATATYPE', $datatype);
         oci_define_by_name($stmt, 'HIGHERBRANCH', $higherbranch);
@@ -100,6 +102,32 @@ $sql = "delete from branches_services where deleted = 1";
         oci_define_by_name($stmt, 'CREATIONDATE', $creationdate);
         if (oci_execute($stmt)) {
             if (oci_fetch($stmt)) {
+              $is_service_in = false;
+              $is_district_in = false;
+              $serv_sql = "select * from branches_services where branch = :p1 and service = :p2 and deleted = '0'";
+              $serv_stmt = oci_parse($link, $serv_sql);
+              oci_bind_by_name($serv_stmt, ':p1', $id);
+              oci_bind_by_name($serv_stmt, ':p2', $_SESSION["service"]);
+              if (oci_execute($serv_stmt)) {
+                if (oci_fetch($serv_stmt)) {
+                  $is_service_in = true;
+                }
+              }
+              else {
+                echo "Произошла непредвиденная ошибка";
+              }
+              $dist_sql = "select * from branches_districts where branch = :p1 and district = :p2 and deleted = '0'";
+              $dist_stmt = oci_parse($link, $dist_sql);
+              oci_bind_by_name($dist_stmt, ':p1', $id);
+              oci_bind_by_name($dist_stmt, ':p2', $_SESSION["district"]);
+              if (oci_execute($dist_stmt)) {
+                if (oci_fetch($dist_stmt)) {
+                  $is_district_in = true;
+                }
+              }
+              else {
+                echo "Произошла непредвиденная ошибка";
+              }
             echo "<thead>".
         "<tr class ='active'>".
         "<th>Название</th>".
@@ -123,11 +151,39 @@ $sql = "delete from branches_services where deleted = 1";
         "<td>". $branch_string . "</td>".
         "<td>". $creator . "</td>".
         "<td>" . $creationdate  . "</td>".
-        "<td><button type='button' class='btn btn-primary'><i class='far fa-eye'></i></button>		".
-        "<button type='button' class='btn btn-success'><i class='fas fa-edit'></i></button>	".
-        "<button type='button' class='btn btn-danger'><i class='fa fa-trash'></i></button></td>".
-        "</tr>";
+        "<td><button type='button' class='btn btn-primary'><i class='far fa-eye'></i></button>    ";
+        if ($_SESSION["role"] == 2 || ($is_service_in && $is_district_in)){
+          echo "<button type='button' class='btn btn-success'><i class='fas fa-edit'></i></button>  ".
+        "<button type='button' class='btn btn-danger'><i class='fa fa-trash'></i></button></td>";
+        }
+        echo "</tr>";
         while (oci_fetch($stmt)) {
+          $is_service_in = false;
+              $is_district_in = false;
+              $serv_sql = "select * from branches_services where branch = :p1 and service = :p2 and deleted = '0'";
+              $serv_stmt = oci_parse($link, $serv_sql);
+              oci_bind_by_name($serv_stmt, ':p1', $id);
+              oci_bind_by_name($serv_stmt, ':p2', $_SESSION["service"]);
+              if (oci_execute($serv_stmt)) {
+                if (oci_fetch($serv_stmt)) {
+                  $is_service_in = true;
+                }
+              }
+              else {
+                echo "Произошла непредвиденная ошибка";
+              }
+              $dist_sql = "select * from branches_districts where branch = :p1 and district = :p2 and deleted = '0'";
+              $dist_stmt = oci_parse($link, $dist_sql);
+              oci_bind_by_name($dist_stmt, ':p1', $id);
+              oci_bind_by_name($dist_stmt, ':p2', $_SESSION["district"]);
+              if (oci_execute($dist_stmt)) {
+                if (oci_fetch($dist_stmt)) {
+                  $is_district_in = true;
+                }
+              }
+              else {
+                echo "Произошла непредвиденная ошибка";
+              }
             echo "<tr>".
         "<td class='name'>". $name . "</td>";
         if (is_null($higherbranch)) {
@@ -140,10 +196,12 @@ $sql = "delete from branches_services where deleted = 1";
         "<td>". $branch_string . "</td>".
         "<td>". $creator . "</td>".
         "<td>" . $creationdate . "</td>".
-        "<td><button type='button' class='btn btn-primary'><i class='far fa-eye'></i></button>		".
-        "<button type='button' class='btn btn-success'><i class='fas fa-edit'></i></button>	".
-        "<button type='button' class='btn btn-danger'><i class='fa fa-trash'></i></button></td>".
-        "</tr>";
+        "<td><button type='button' class='btn btn-primary'><i class='far fa-eye'></i></button>    ";
+        if ($_SESSION["role"] == 2 || ($is_service_in && $is_district_in)){
+          echo "<button type='button' class='btn btn-success'><i class='fas fa-edit'></i></button>  ".
+        "<button type='button' class='btn btn-danger'><i class='fa fa-trash'></i></button></td>";
+        }
+        echo "</tr>";
         }
         echo "</tbody>".
         "</table>";

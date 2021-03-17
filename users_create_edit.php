@@ -100,7 +100,7 @@ if (isset($_POST['addButton']))
                     {
                       if (!is_null($device)) {
                       require_once "config.php";
-                            
+                      $sql = "select * from users where login = :p1 and deleted = '0'";
                         if ($stmt = oci_parse($link, $sql))
                         {
                             oci_bind_by_name($stmt, ':p1', $name);
@@ -225,7 +225,7 @@ if (isset($_POST['addButton']))
               <a class="nav-link active" aria-current="page" href="main_page.php">Список активных сотрудников</a>
             </li>
             <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Изменение информации в системе</a>
+            <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Изменение информации о системе</a>
               <ul class="dropdown-menu text-center" aria-labelledby="dropdown01">
               <li><a class="dropdown-item" href="services.php">Службы</a></li>
               <li><a class="dropdown-item" href="districts.php">Районы</a></li>
@@ -327,10 +327,18 @@ if (isset($_POST['addButton']))
             echo "</select></div>";
         }
         echo "<div class='form-group'><select id='devices' name='devices'>";
-        $sql = "select iddevice, name from devices where (iddevice not in (select device from users where deleted = '0') or name = :p1)  and deleted = '0'";
+        $sql = "select iddevice, name from devices d join users u on u.iduser = d.createdby where (iddevice not in (select device from users where deleted = '0') or name = :p1) and d.deleted = '0'";
+        if ($_SESSION["role"] == 1) {
+            $sql = $sql . " and u.service = :p2 and u.district = :p3";
+        }
         if ($stmt = oci_parse($link, $sql))
         {
             oci_bind_by_name($stmt, ':p1', $device);
+            if ($_SESSION["role"] == 1) {
+            oci_bind_by_name($stmt, ':p2', $_SESSION["service"]);
+            oci_bind_by_name($stmt, ':p3', $_SESSION["district"]);
+        }
+            
             oci_define_by_name($stmt, 'IDDEVICE', $id);
             oci_define_by_name($stmt, 'NAME', $drop_device);
             if (oci_execute($stmt))

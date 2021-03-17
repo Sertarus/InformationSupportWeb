@@ -53,7 +53,7 @@ if (isset($_POST['deleteButton'])) {
               <a class="nav-link active" aria-current="page" href="main_page.php">Список активных сотрудников</a>
             </li>
             <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Изменение информации в системе</a>
+            <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Изменение информации о системе</a>
               <ul class="dropdown-menu text-center" aria-labelledby="dropdown01">
               <li><a class="dropdown-item" href="services.php">Службы</a></li>
               <li><a class="dropdown-item" href="districts.php">Районы</a></li>
@@ -122,7 +122,7 @@ if (isset($_POST['deleteButton'])) {
         "<td>". $creator . "</td>".
         "<td>" . $creationdate . "</td>".
         "<td><button type='button' class='btn btn-primary'><i class='far fa-eye'></i></button>		";
-        if ($_SESSION["role"] == 2 || ($_SESSION["service"] == $service && $_SESSION["district"] == $district && $role !== 2)) {
+        if ($_SESSION["role"] == 2 || ($_SESSION["service"] == $service && $_SESSION["district"] == $district && $role != 2)) {
         	echo "<button type='button' class='btn btn-success'><i class='fas fa-edit'></i></button>	".
         	"<button type='button' class='btn btn-danger'><i class='fa fa-trash'></i></button></td>";
         }

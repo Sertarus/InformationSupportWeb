@@ -186,7 +186,7 @@ else {
               <a class="nav-link active" aria-current="page" href="main_page.php">Список активных сотрудников</a>
             </li>
             <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Изменение информации в системе</a>
+            <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Изменение информации о системе</a>
               <ul class="dropdown-menu text-center" aria-labelledby="dropdown01">
               <li><a class="dropdown-item" href="services.php">Службы</a></li>
               <li><a class="dropdown-item" href="districts.php">Районы</a></li>
@@ -247,12 +247,40 @@ else {
                 {
                     while (oci_fetch($stmt))
                     {
-                        $selected = "";
+                        $is_service_in = false;
+              $is_district_in = false;
+              $serv_sql = "select * from branches_services where branch = :p1 and service = :p2 and deleted = '0'";
+              $serv_stmt = oci_parse($link, $serv_sql);
+              oci_bind_by_name($serv_stmt, ':p1', $id);
+              oci_bind_by_name($serv_stmt, ':p2', $_SESSION["service"]);
+              if (oci_execute($serv_stmt)) {
+                if (oci_fetch($serv_stmt)) {
+                  $is_service_in = true;
+                }
+              }
+              else {
+                echo "Произошла непредвиденная ошибка";
+              }
+              $dist_sql = "select * from branches_districts where branch = :p1 and district = :p2 and deleted = '0'";
+              $dist_stmt = oci_parse($link, $dist_sql);
+              oci_bind_by_name($dist_stmt, ':p1', $id);
+              oci_bind_by_name($dist_stmt, ':p2', $_SESSION["district"]);
+              if (oci_execute($dist_stmt)) {
+                if (oci_fetch($dist_stmt)) {
+                  $is_district_in = true;
+                }
+              }
+              else {
+                echo "Произошла непредвиденная ошибка";
+              }
+              if (($is_service_in && $is_district_in) || $_SESSION["role"] == 2){
+                $selected = "";
                         if ($branch == $id)
                         {
                             $selected = " selected";
                         }
                         echo "<option value='" . $id . "'" . $selected . ">" . $drop_branch . "</option>";
+              }      
                     }
                 }
                 else
