@@ -97,7 +97,7 @@ if (isset($_POST['addButton']))
             $form_data[htmlspecialchars($replaced_key)] = htmlspecialchars($value);
         }
     }
-    if (strlen($name) >= 1 && strlen($name) <= 30)
+    if (mb_strlen($name) >= 1 && mb_strlen($name) <= 30)
     {
         $allowed = array(
             "image/jpeg",
@@ -134,7 +134,7 @@ imagejpeg($output, "tmpimage.jpg", 50);
                 {
                     if (strcmp($key, "name") != 0 && strcmp($key, "branches") != 0 && strcmp($key, "addButton") != 0)
                     {
-                        if (strlen(htmlspecialchars($value)) < 1 && strlen(htmlspecialchars($value)) > 150)
+                        if (mb_strlen(htmlspecialchars($value)) < 1 && mb_strlen(htmlspecialchars($value)) > 150)
                         {
                             $is_error_form = true;
                         }

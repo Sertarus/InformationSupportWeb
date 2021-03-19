@@ -43,7 +43,7 @@ if (isset($_POST['addButton'])) {
       $is_human = 0;
     }
   }
-  if (strlen($name) >= 1 && strlen($name) <= 40) {
+  if (mb_strlen($name) >= 1 && mb_strlen($name) <= 40) {
     require_once "config.php";
     if (filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN)) {
       $sql = "select * from datatypes where name = :p1 and name != :p2 and deleted = '0'";
@@ -73,7 +73,7 @@ if (isset($_POST['addButton'])) {
           
       if (strcmp($key, "name") != 0 && strcmp($key, "isHuman") != 0 && strcmp($key, "addButton") != 0) {
         $rec_arr[] = $value;
-        if (strlen($value) < 1 || strlen($value) > 20) {
+        if (mb_strlen($value) < 1 || mb_strlen($value) > 20) {
         $is_rec_err = true;
         $name_err = "Длина названия каждого из реквизитов должна быть от 1 до 20 символов";
       }

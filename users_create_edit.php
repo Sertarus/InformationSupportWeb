@@ -88,15 +88,15 @@ if (isset($_POST['addButton']))
     else {
       $blocked = 1;
     }
-    if (strlen($_POST['name']) >= 1 && strlen($_POST['name']) <= 20 || filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN))
+    if (mb_strlen($_POST['name']) >= 1 && mb_strlen($_POST['name']) <= 20 || filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN))
     {
-      if (strlen($_POST['pass']) >= 1 && strlen($_POST['pass']) <= 20)
+      if (mb_strlen($_POST['pass']) >= 1 && mb_strlen($_POST['pass']) <= 20)
         {
-          if (strlen($_POST['fullname']) >= 1 && strlen($_POST['fullname']) <= 60)
+          if (mb_strlen($_POST['fullname']) >= 1 && mb_strlen($_POST['fullname']) <= 60)
             {
-              if (strlen($_POST['email']) >= 1 && strlen($_POST['email']) <= 20)
+              if (mb_strlen($_POST['email']) >= 1 && mb_strlen($_POST['email']) <= 20)
                 {
-                  if (strlen($_POST['phonenumber']) >= 1 && strlen($_POST['phonenumber']) <= 16)
+                  if (mb_strlen($_POST['phonenumber']) >= 1 && mb_strlen($_POST['phonenumber']) <= 16)
                     {
                       if (!is_null($device)) {
                       require_once "config.php";

@@ -42,7 +42,7 @@ $branch = $_POST['branches'];
 $services = $_POST['services'];
 $districts = $_POST['districts'];
 
-if (strlen($name) >= 1 && strlen($name) <= 30) {
+if (mb_strlen($name) >= 1 && mb_strlen($name) <= 30) {
     if (!empty($services) || filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN)) {
         if (!empty($districts) || filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN)) {
             require_once "config.php";

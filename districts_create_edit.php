@@ -15,7 +15,7 @@ if (filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN)) {
 
 if (isset($_POST['addButton'])) {
           $name = $_POST['name'];
-          if (strlen($_POST['name']) >= 1 && strlen($_POST['name']) <= 40) {
+          if (mb_strlen($_POST['name']) >= 1 && mb_strlen($_POST['name']) <= 40) {
             require_once "config.php";
             $sql = "select * from districts where name = :p1 and deleted = '0'";
             if ($stmt = oci_parse($link, $sql)) {
