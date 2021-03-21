@@ -28,7 +28,7 @@ if (filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN))
 {
     $name = $_GET["name"];
     require_once "config.php";
-    $sql = "select password, fullname, email, phonenumber, role, service, district, device, blocked, s.name as servicename, d.name as districtname, dev.name as devicename from users u join services s on s.idservice = u.service join districts d on d.iddistrict = u.district join devices dev on dev.iddevice = u.device where login = :p1 and u.deleted = '0'";
+    $sql = "select password, fullname, email, phonenumber, role, service, district, device, blocked from users where login = :p1 and deleted = '0'";
     if ($stmt = oci_parse($link, $sql))
     {
         oci_bind_by_name($stmt, ':p1', $name);
@@ -37,9 +37,9 @@ if (filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN))
         oci_define_by_name($stmt, 'EMAIL', $current_email);
         oci_define_by_name($stmt, 'PHONENUMBER', $current_number);
         oci_define_by_name($stmt, 'ROLE', $current_role);
-        oci_define_by_name($stmt, 'SERVICENAME', $current_service);
-        oci_define_by_name($stmt, 'DISTRICTNAME', $current_district);
-        oci_define_by_name($stmt, 'DEVICENAME', $current_device);
+        oci_define_by_name($stmt, 'SERVICE', $current_service);
+        oci_define_by_name($stmt, 'DISTRICT', $current_district);
+        oci_define_by_name($stmt, 'DEVICE', $current_device);
         oci_define_by_name($stmt, 'BLOCKED', $current_blocked);
         if (oci_execute($stmt))
         {
@@ -109,12 +109,14 @@ if (isset($_POST['addButton']))
                                 if (oci_fetch($stmt))
                                 {
                                     $name_err = "Пользователь с таким именем уже существует";
+                                    oci_free_statement($stmt);
                                 }
                                 else
                                 {
                                     if (filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN))
                                     {
                                         $sql = "update users set password = :p1, fullname = :p2, email = :p3, phonenumber = :p4, role = :p5, service = :p6, district = :p7, device = :p8, changedby = :p9, changeddate = SYSTIMESTAMP, blocked = :p10 where login = :p11";
+                                        oci_free_statement($stmt);
                                         if ($stmt = oci_parse($link, $sql))
                                         {
                                             oci_bind_by_name($stmt, ':p1', $pass);
@@ -299,6 +301,7 @@ if (isset($_POST['addButton']))
                 {
                     echo "Произошла непредвиденная ошибка";
                 }
+                oci_free_statement($stmt);
             }
             echo "</select></div>";
             echo "<div class='form-group'><select id='districts' name='districts'>";
@@ -323,11 +326,12 @@ if (isset($_POST['addButton']))
                 {
                     echo "Произошла непредвиденная ошибка";
                 }
+                oci_free_statement($stmt);
             }
             echo "</select></div>";
         }
         echo "<div class='form-group'><select id='devices' name='devices'>";
-        $sql = "select iddevice, name from devices d join users u on u.iduser = d.createdby where (iddevice not in (select device from users where deleted = '0') or name = :p1) and d.deleted = '0'";
+        $sql = "select iddevice, name from devices d join users u on u.iduser = d.createdby where (iddevice not in (select device from users where deleted = '0') or iddevice = :p1) and d.deleted = '0'";
         if ($_SESSION["role"] == 1) {
             $sql = $sql . " and u.service = :p2 and u.district = :p3";
         }
@@ -357,6 +361,7 @@ if (isset($_POST['addButton']))
             {
                 echo "Произошла непредвиденная ошибка";
             }
+            oci_free_statement($stmt);
         }
         echo "</select><span class='help-block'>" . $device_err . "</span></div>";
         if ($blocked == 1) {
@@ -370,6 +375,7 @@ if (isset($_POST['addButton']))
           $button_name = "Изменить пользователя";
         }
         echo "</div></div><input type='submit' class='btn btn-primary' value='" . $button_name . "' name='addButton'></form>";
+        oci_close($link);
 ?>
     <script src="js/bootstrap.min.js"></script>
   </body>

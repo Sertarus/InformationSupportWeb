@@ -7,6 +7,7 @@ if ($stmt = oci_parse($link, $sql)) {
 	if (!oci_execute($stmt)) {
 		echo "Произошла непредвиденная ошибка";
 	}
+  oci_free_statement($stmt);
 }
 $sql = "update datatypes_recordtypes set changedby = :p1, changeddate = SYSTIMESTAMP, deleted = 1 where datatype in (select iddatatype from datatypes where name = :p2)";
 if ($stmt = oci_parse($link, $sql)) {
@@ -15,6 +16,7 @@ if ($stmt = oci_parse($link, $sql)) {
 	if (!oci_execute($stmt)) {
 		echo "Произошла непредвиденная ошибка";
 	}
+  oci_free_statement($stmt);
 }
 $sql = "select name from recordtypes where deleted = '0' and idrecordtype not in (select recordtype from datatypes_recordtypes where deleted = '0') and idrecordtype not in (select recordtype from recordvalues where deleted = 0)";
 if ($stmt = oci_parse($link, $sql)) {
@@ -34,8 +36,8 @@ if ($stmt = oci_parse($link, $sql)) {
       else {
         echo "Произошла непредвиденная ошибка";
       }
+      oci_free_statement($stmt);
     }
-oci_free_statement($stmt);
 oci_close($link);
 header("location: forms.php");
 exit;

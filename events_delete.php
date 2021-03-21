@@ -7,6 +7,7 @@ if ($stmt = oci_parse($link, $sql)) {
 	if (!oci_execute($stmt)) {
 		echo "Произошла непредвиденная ошибка";
 	}
+	oci_free_statement($stmt);
 }
 $sql = "update events_services set changedby = :p1, changeddate = SYSTIMESTAMP, deleted = 1 where event in (select idevent from events where name = :p2)";
 if ($stmt = oci_parse($link, $sql)) {
@@ -15,6 +16,7 @@ if ($stmt = oci_parse($link, $sql)) {
 	if (!oci_execute($stmt)) {
 		echo "Произошла непредвиденная ошибка";
 	}
+	oci_free_statement($stmt);
 }
 $sql = "update events_districts set changedby = :p1, changeddate = SYSTIMESTAMP, deleted = 1 where event in (select idevent from events where name = :p2)";
 if ($stmt = oci_parse($link, $sql)) {
@@ -23,8 +25,8 @@ if ($stmt = oci_parse($link, $sql)) {
   if (!oci_execute($stmt)) {
     echo "Произошла непредвиденная ошибка";
   }
+  oci_free_statement($stmt);
 }
-oci_free_statement($stmt);
 oci_close($link);
 header("location: events.php");
 exit;

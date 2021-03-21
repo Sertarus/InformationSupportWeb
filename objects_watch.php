@@ -113,6 +113,7 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     else {
       echo "Произошла непредвиденная ошибка";
     }
+    oci_free_statement($stmt);
   }
   $sql = "select recordtype, r.name, dataorder, dr.deleted from datatypes_recordtypes dr join recordtypes r on r.idrecordtype = dr.recordtype where datatype = :p1 and dr.deleted = '0' order by dataorder";
   echo "<br><li>Форма объекта:</li>";
@@ -135,6 +136,7 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
           else {
             echo "Произошла непредвиденная ошибка";
           }
+          oci_free_statement($rec_stmt);
         }
       }
       echo "</ul></div></div></div>";

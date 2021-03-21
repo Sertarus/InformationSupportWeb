@@ -47,6 +47,7 @@ if (filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN)) {
           else {
             echo "Произошла непредвиденная ошибка";
           }
+          oci_free_statement($serv_stmt);
         }
         $dist_sql = "select district from events_districts where event = :p1 and deleted = '0'";
         if ($dist_stmt = oci_parse($link, $dist_sql)) {
@@ -60,12 +61,14 @@ if (filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN)) {
           else {
             echo "Произошла непредвиденная ошибка";
           }
+          oci_free_statement($dist_stmt);
         }
       }
     } 
     else {
       echo "Произошла непредвиденная ошибка";
-    }   
+    }
+    oci_free_statement($stmt);   
   }
 }
 
@@ -103,6 +106,7 @@ if (isset($_POST['addButton'])) {
                             if (filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN)) {
                               $event_id = "";
                               $sql = "select idevent from events where deleted = '0' and name = :p1";
+                              oci_free_statement($stmt);
                               if ($stmt = oci_parse($link, $sql)) {
                                 oci_bind_by_name($stmt, ':p1', $_GET['name']);
                                 oci_define_by_name($stmt, 'IDEVENT', $id);
@@ -126,6 +130,7 @@ if (isset($_POST['addButton'])) {
                                 if (!oci_execute($stmt)) {
                                   echo "Произошла непредвиденная ошибка";
                                 }
+                                oci_free_statement($stmt);
                               }
                               $sql = "update events_services set changedby = :p1, changeddate = SYSTIMESTAMP, deleted = '1' where event = :p2 and ";
                               $counter = 1;
@@ -144,6 +149,7 @@ if (isset($_POST['addButton'])) {
                                 if (!oci_execute($stmt)) {
                                   echo "Произошла непредвиденная ошибка";
                                 }
+                                oci_free_statement($stmt);
                               }
                               $sql = "update events_districts set changedby = :p1, changeddate = SYSTIMESTAMP, deleted = '1' where event = :p2 and ";
                               $counter = 1;
@@ -162,6 +168,7 @@ if (isset($_POST['addButton'])) {
                                 if (!oci_execute($stmt)) {
                                   echo "Произошла непредвиденная ошибка";
                                 }
+                                oci_free_statement($stmt);
                               }
                               foreach ($services as $key => $value) {
                                 $sql = "select * from events_services where event = :p1 and service = :p2 and deleted = '0'";
@@ -178,12 +185,14 @@ if (isset($_POST['addButton'])) {
                                         if (!oci_execute($insert_stmt)) {
                                           echo "Произошла непредвиденная ошибка";
                                         }
+                                        oci_free_statement($insert_stmt);
                                       }
                                     }
                                   }
                                   else {
                                     echo "Произошла непредвиденная ошибка";
                                   }
+                                  oci_free_statement($stmt);
                                 }
                               }
                               foreach ($districts as $key => $value) {
@@ -201,12 +210,14 @@ if (isset($_POST['addButton'])) {
                                         if (!oci_execute($insert_stmt)) {
                                           echo "Произошла непредвиденная ошибка";
                                         }
+                                        oci_free_statement($insert_stmt);
                                       }
                                     }
                                   }
                                   else {
                                     echo "Произошла непредвиденная ошибка";
                                   }
+                                  oci_free_statement($stmt);
                                 }
                               }
                             }
@@ -221,6 +232,7 @@ if (isset($_POST['addButton'])) {
                                 if (!oci_execute($stmt)) {
                                   echo "Произошла непредвиденная ошибка";
                                 }
+                                oci_free_statement($stmt);
                               }
                               $event_id = "";
                               $sql = "select idevent from events where deleted = '0' and name = :p1";
@@ -235,6 +247,7 @@ if (isset($_POST['addButton'])) {
                                 else {
                                   echo "Произошла непредвиденная ошибка";
                                 }
+                                oci_free_statement($stmt);
                               }
                               foreach ($services as $key => $value) {
                                 $sql = "insert into events_services (event, service, createdby, creationdate) values (:p1, :p2, :p3, SYSTIMESTAMP)";
@@ -245,6 +258,7 @@ if (isset($_POST['addButton'])) {
                                   if (!oci_execute($insert_stmt)) {
                                     echo "Произошла непредвиденная ошибка";
                                   }
+                                  oci_free_statement($insert_stmt);
                                 }
                               }
                               foreach ($districts as $key => $value) {
@@ -256,6 +270,7 @@ if (isset($_POST['addButton'])) {
                                   if (!oci_execute($insert_stmt)) {
                                     echo "Произошла непредвиденная ошибка";
                                   }
+                                  oci_free_statement($insert_stmt);
                                 }
                               }
                             }
@@ -386,6 +401,7 @@ if (isset($_POST['addButton'])) {
                 {
                     echo "Произошла непредвиденная ошибка";
                 }
+                oci_free_statement($stmt);
             }
             echo "</select></div>";
 
@@ -414,6 +430,7 @@ if (isset($_POST['addButton'])) {
                 {
                     echo "Произошла непредвиденная ошибка";
                 }
+                oci_free_statement($stmt);
             }
             echo "</select></div></div>";
           
@@ -424,6 +441,7 @@ if (isset($_POST['addButton'])) {
       echo "</div>
                 <input type='submit' class='btn btn-primary' value='" . $addButton_name . "' name='addButton'>
             </form>";
+            oci_close($link);
     ?>
     <script src="js/bootstrap.min.js"></script>
   </body>

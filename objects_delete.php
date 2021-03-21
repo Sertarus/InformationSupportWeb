@@ -7,6 +7,7 @@ if ($stmt = oci_parse($link, $sql)) {
 	if (!oci_execute($stmt)) {
 		echo "Произошла непредвиденная ошибка";
 	}
+  oci_free_statement($stmt);
 }
 $sql = "update recordvalues set changedby = :p1, changeddate = SYSTIMESTAMP, deleted = 1 where dataobject in (select iddataobject from dataobjects where name = :p2)";
 if ($stmt = oci_parse($link, $sql)) {
@@ -15,6 +16,7 @@ if ($stmt = oci_parse($link, $sql)) {
 	if (!oci_execute($stmt)) {
 		echo "Произошла непредвиденная ошибка";
 	}
+  oci_free_statement($stmt);
 }
 $sql = "select name from recordtypes where deleted = '0' and idrecordtype not in (select recordtype from datatypes_recordtypes where deleted = '0') and idrecordtype not in (select recordtype from recordvalues where deleted = 0)";
 if ($stmt = oci_parse($link, $sql)) {
@@ -28,14 +30,15 @@ if ($stmt = oci_parse($link, $sql)) {
             if (!oci_execute($rec_upd_stmt)) {
               echo "Произошла непредвиденная ошибка";
             }
+            oci_free_statement($rec_upd_stmt);
           }
         }
       }
       else {
         echo "Произошла непредвиденная ошибка";
       }
+      oci_free_statement($stmt);
     }
-oci_free_statement($stmt);
 oci_close($link);
 header("location: objects.php");
 exit;

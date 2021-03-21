@@ -18,18 +18,21 @@ if (isset($_POST['deleteButton'])) {
 	if (!oci_execute($stmt)) {
 		echo "Произошла непредвиденная ошибка";
 	}
+  oci_free_statement($stmt);
 }
 $sql = "delete from events_services where deleted = 1";
   if ($stmt = oci_parse($link, $sql)) {
   if (!oci_execute($stmt)) {
     echo "Произошла непредвиденная ошибка";
   }
+  oci_free_statement($stmt);
 }
 $sql = "delete from events_districts where deleted = 1";
   if ($stmt = oci_parse($link, $sql)) {
   if (!oci_execute($stmt)) {
     echo "Произошла непредвиденная ошибка";
   }
+  oci_free_statement($stmt);
 }
 }
 ?>
@@ -116,6 +119,7 @@ $sql = "delete from events_districts where deleted = 1";
               else {
                 echo "Произошла непредвиденная ошибка";
               }
+              oci_free_statement($serv_stmt);
               $dist_sql = "select * from events_districts where event = :p1 and district = :p2 and deleted = '0'";
               $dist_stmt = oci_parse($link, $dist_sql);
               oci_bind_by_name($dist_stmt, ':p1', $id);
@@ -128,6 +132,7 @@ $sql = "delete from events_districts where deleted = 1";
               else {
                 echo "Произошла непредвиденная ошибка";
               }
+              oci_free_statement($dist_stmt);
             echo "<thead>".
         "<tr class ='active'>".
         "<th>Название</th>".
@@ -166,6 +171,7 @@ $sql = "delete from events_districts where deleted = 1";
               else {
                 echo "Произошла непредвиденная ошибка";
               }
+              oci_free_statement($serv_stmt);
               $dist_sql = "select * from events_districts where event = :p1 and district = :p2 and deleted = '0'";
               $dist_stmt = oci_parse($link, $dist_sql);
               oci_bind_by_name($dist_stmt, ':p1', $id);
@@ -178,6 +184,7 @@ $sql = "delete from events_districts where deleted = 1";
               else {
                 echo "Произошла непредвиденная ошибка";
               }
+              oci_free_statement($dist_stmt);
             echo "<tr>".
         "<td class='name'>". $name . "</td>".
         "<td>". $timestart . "</td>".

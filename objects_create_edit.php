@@ -37,6 +37,7 @@ if (filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN))
         {
             echo "Произошла непредвиденная ошибка";
         }
+        oci_free_statement($stmt);
     }
 
     $sql = "select recordtype, r.name, dataorder, dr.deleted from datatypes_recordtypes dr join recordtypes r on r.idrecordtype = dr.recordtype where datatype in (select datatype from branches where idbranch = :p1 and deleted = '0') and dr.deleted = '0' order by dataorder";
@@ -67,6 +68,7 @@ if (filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN))
                     {
                         echo "Произошла непредвиденная ошибка";
                     }
+                    oci_free_statement($req_val_stmt);
                 }
             }
         }
@@ -74,8 +76,8 @@ if (filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN))
         {
             echo "Произошла непредвиденная ошибка";
         }
+        oci_free_statement($stmt);
     }
-    oci_free_statement($stmt);
 }
 
 if (isset($_POST['addButton']))
@@ -170,6 +172,7 @@ imagejpeg($output, "tmpimage.jpg", 50);
                                     else {
                                         $sql = "update dataobjects set name = :p1, image = EMPTY_BLOB(), changedby = :p3, changeddate = SYSTIMESTAMP where name = :p4 returning image into :p2";
                                     }
+                                    oci_free_statement($stmt);
                                     if ($stmt = oci_parse($link, $sql))
                                         
                                     {
@@ -195,6 +198,7 @@ imagejpeg($output, "tmpimage.jpg", 50);
                                         }
                                         $lob->free();
                                         }
+                                        oci_free_statement($stmt);
                                     }
                                     foreach ($_POST as $key => $value)
                                     {
@@ -213,6 +217,7 @@ imagejpeg($output, "tmpimage.jpg", 50);
                                                     {
                                                         echo "Произошла непредвиденная ошибка";
                                                     }
+                                                    oci_free_statement($stmt);
                                                 }
                                             }
                                         }
@@ -258,6 +263,7 @@ imagejpeg($output, "tmpimage.jpg", 50);
                                         }
                                         $lob->free();   
                                         }
+                                        oci_free_statement($stmt);
                                     }
                                     $dataobject_id = "";
                                     $data_sql = "select iddataobject from dataobjects where name = :p1 and deleted = '0'";
@@ -276,6 +282,7 @@ imagejpeg($output, "tmpimage.jpg", 50);
                                         {
                                             echo "Произошла непредвиденная ошибка";
                                         }
+                                        oci_free_statement($data_stmt);
                                     }
                                     foreach ($form_data as $key => $value)
                                     {
@@ -296,6 +303,7 @@ imagejpeg($output, "tmpimage.jpg", 50);
                                             {
                                                 echo "Произошла непредвиденная ошибка";
                                             }
+                                            oci_free_statement($record_stmt);
                                         }
                                         $sql = "insert into recordvalues (value, recordtype, dataobject, createdby, creationdate) values (:p1, :p2, :p3, :p4, SYSTIMESTAMP)";
                                         if ($stmt = oci_parse($link, $sql))
@@ -308,6 +316,7 @@ imagejpeg($output, "tmpimage.jpg", 50);
                                             {
                                                 echo "Произошла непредвиденная ошибка";
                                             }
+                                            oci_free_statement($stmt);
                                         }
                                     }
                                 }
@@ -324,7 +333,7 @@ imagejpeg($output, "tmpimage.jpg", 50);
                             echo "Произошла непредвиденная ошибка";
                         }
                     }
-                    oci_close($link);
+                    oci_free_statement($stmt);
                 }
                 else
                 {
@@ -451,6 +460,7 @@ if (!filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN))
                 {
                     echo "Произошла непредвиденная ошибка";
                 }
+                oci_free_statement($serv_stmt);
                 $dist_sql = "select * from branches_districts where branch = :p1 and district = :p2 and deleted = '0'";
                 $dist_stmt = oci_parse($link, $dist_sql);
                 oci_bind_by_name($dist_stmt, ':p1', $id);
@@ -466,6 +476,7 @@ if (!filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN))
                 {
                     echo "Произошла непредвиденная ошибка";
                 }
+                oci_free_statement($dist_stmt);
                 if (($is_service_in && $is_district_in) || $_SESSION["role"] == 2)
                 {
                     $selected = "";
@@ -481,6 +492,7 @@ if (!filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN))
         {
             echo "Произошла непредвиденная ошибка";
         }
+        oci_free_statement($stmt);
     }
     echo "</select></div>";
 }

@@ -18,6 +18,7 @@ if (isset($_POST['deleteButton'])) {
 	if (!oci_execute($stmt)) {
 		echo "Произошла непредвиденная ошибка";
 	}
+  oci_free_statement($stmt);
 }
 }
 ?>

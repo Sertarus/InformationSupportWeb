@@ -18,7 +18,7 @@ if (filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN))
 {
     $name = $_GET["name"];
     require_once "config.php";
-    $sql = "select d.name as datatype from branches b join datatypes d on d.iddatatype = b.datatype where b.deleted = '0' and b.name = :p1";
+    $sql = "select datatype from branches where deleted = '0' and name = :p1";
     if ($stmt = oci_parse($link, $sql)) {
         oci_bind_by_name($stmt, ':p1', $name);
         oci_define_by_name($stmt, 'DATATYPE', $current_form);
@@ -30,8 +30,8 @@ if (filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN))
         else {
             echo "Произошла непредвиденная ошибка";
         }
+        oci_free_statement($stmt);
     }
-    oci_free_statement($stmt);
 }
 
 if (isset($_POST['addButton']))
@@ -59,6 +59,7 @@ if (mb_strlen($name) >= 1 && mb_strlen($name) <= 30) {
                 }
                 if (oci_execute($stmt)) {
                     if (!oci_fetch($stmt)) {
+                        oci_free_statement($stmt);
                         if (filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN)) {
                             $sql = "update branches set name = :p1, datatype = :p2, changedby = :p3, changeddate = SYSTIMESTAMP where name = :p4";
                             if ($stmt = oci_parse($link, $sql)) {
@@ -69,6 +70,7 @@ if (mb_strlen($name) >= 1 && mb_strlen($name) <= 30) {
                                 if (!oci_execute($stmt)) {
                                     echo "Произошла непредвиденная ошибка";
                                 }
+                                oci_free_statement($stmt);
                             }
                         }
                         else {
@@ -86,8 +88,10 @@ if (mb_strlen($name) >= 1 && mb_strlen($name) <= 30) {
                                 oci_bind_by_name($stmt, ':p4', $_SESSION['iduser']);
                                 if (!oci_execute($stmt)) {
                                     echo "Произошла непредвиденная ошибка";
+                                    oci_free_statement($stmt);
                                 }
                                 else {
+                                    oci_free_statement($stmt);
                                     $sql = "select idbranch from branches where name = :p1 and deleted = '0'";
                                     if ($stmt = oci_parse($link, $sql)) {
                                         oci_bind_by_name($stmt, ':p1', $name);
@@ -103,6 +107,7 @@ if (mb_strlen($name) >= 1 && mb_strlen($name) <= 30) {
                                                         if (!oci_execute($add_serv_stmt)) {
                                                             echo "Произошла непредвиденная ошибка";
                                                         }
+                                                        oci_free_statement($add_serv_stmt);
                                                     }
                                                 }
                                                 foreach ($districts as $key => $value) {
@@ -114,6 +119,7 @@ if (mb_strlen($name) >= 1 && mb_strlen($name) <= 30) {
                                                         if (!oci_execute($add_dist_stmt)) {
                                                             echo "Произошла непредвиденная ошибка";
                                                         }
+                                                        oci_free_statement($add_dist_stmt);
                                                     }
                                                 }
                                             }
@@ -128,9 +134,9 @@ if (mb_strlen($name) >= 1 && mb_strlen($name) <= 30) {
                         header("location: branches.php");
                     }
                     else {
+                        oci_free_statement($stmt);
                         $name_err = "Ветка с таким именем уже существует";
                     }
-                    oci_close($link);
                 }
                 else {
                     echo "Произошла непредвиденная ошибка";
@@ -233,6 +239,7 @@ else {
                 {
                     echo "Произошла непредвиденная ошибка";
                 }
+                oci_free_statement($stmt);
             }
             echo "</select></div>";
             if (!filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN)) {
@@ -261,6 +268,7 @@ else {
               else {
                 echo "Произошла непредвиденная ошибка";
               }
+              oci_free_statement($serv_stmt);
               $dist_sql = "select * from branches_districts where branch = :p1 and district = :p2 and deleted = '0'";
               $dist_stmt = oci_parse($link, $dist_sql);
               oci_bind_by_name($dist_stmt, ':p1', $id);
@@ -273,6 +281,7 @@ else {
               else {
                 echo "Произошла непредвиденная ошибка";
               }
+              oci_free_statement($dist_stmt);
               if (($is_service_in && $is_district_in) || $_SESSION["role"] == 2){
                 $selected = "";
                         if ($branch == $id)
@@ -287,6 +296,7 @@ else {
                 {
                     echo "Произошла непредвиденная ошибка";
                 }
+                oci_free_statement($stmt);
             }
             echo "</select></div>";
 
@@ -319,6 +329,7 @@ else {
                 {
                     echo "Произошла непредвиденная ошибка";
                 }
+                oci_free_statement($stmt);
             }
             echo "</select></div>";
 
@@ -351,6 +362,7 @@ else {
                 {
                     echo "Произошла непредвиденная ошибка";
                 }
+                oci_free_statement($stmt);
             }
             echo "</select></div></div>";
 }
@@ -360,6 +372,7 @@ else {
           $button_name = "Изменить ветку";
         }
         echo "</div></div><input type='submit' class='btn btn-primary' value='" . $button_name . "' name='addButton'></form>";
+        oci_close($link);
 ?>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/branches_create.js"></script>

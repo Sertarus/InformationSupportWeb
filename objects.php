@@ -18,18 +18,21 @@ if (isset($_POST['deleteButton'])) {
 	if (!oci_execute($stmt)) {
 		echo "Произошла непредвиденная ошибка";
 	}
+  oci_free_statement($stmt);
 }
 $sql = "delete from recordvalues where deleted = 1";
   if ($stmt = oci_parse($link, $sql)) {
   if (!oci_execute($stmt)) {
     echo "Произошла непредвиденная ошибка";
   }
+  oci_free_statement($stmt);
 }
 $sql = "delete from recordtypes where deleted = 1";
   if ($stmt = oci_parse($link, $sql)) {
   if (!oci_execute($stmt)) {
     echo "Произошла непредвиденная ошибка";
   }
+  oci_free_statement($stmt);
 }
 }
 ?>
@@ -115,6 +118,7 @@ $sql = "delete from recordtypes where deleted = 1";
               else {
                 echo "Произошла непредвиденная ошибка";
               }
+              oci_free_statement($serv_stmt);
               $dist_sql = "select * from branches_districts where branch = :p1 and district = :p2 and deleted = '0'";
               $dist_stmt = oci_parse($link, $dist_sql);
               oci_bind_by_name($dist_stmt, ':p1', $branch);
@@ -127,6 +131,7 @@ $sql = "delete from recordtypes where deleted = 1";
               else {
                 echo "Произошла непредвиденная ошибка";
               }
+              oci_free_statement($dist_stmt);
             echo "<thead>".
         "<tr class ='active'>".
         "<th>Название</th>".
@@ -163,6 +168,7 @@ $sql = "delete from recordtypes where deleted = 1";
               else {
                 echo "Произошла непредвиденная ошибка";
               }
+              oci_free_statement($serv_stmt);
               $dist_sql = "select * from branches_districts where branch = :p1 and district = :p2 and deleted = '0'";
               $dist_stmt = oci_parse($link, $dist_sql);
               oci_bind_by_name($dist_stmt, ':p1', $branch);
@@ -175,6 +181,7 @@ $sql = "delete from recordtypes where deleted = 1";
               else {
                 echo "Произошла непредвиденная ошибка";
               }
+              oci_free_statement($dist_stmt);
             echo "<tr>".
         "<td class='name'>". $name . "</td>";
         echo "<td>". $branch_name . "</td>".

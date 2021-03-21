@@ -18,18 +18,21 @@ if (isset($_POST['deleteButton'])) {
 	if (!oci_execute($stmt)) {
 		echo "Произошла непредвиденная ошибка";
 	}
+  oci_free_statement($stmt);
 }
 $sql = "delete from datatypes_recordtypes where deleted = 1";
   if ($stmt = oci_parse($link, $sql)) {
   if (!oci_execute($stmt)) {
     echo "Произошла непредвиденная ошибка";
   }
+  oci_free_statement($stmt);
 }
 $sql = "delete from recordtypes where deleted = 1";
   if ($stmt = oci_parse($link, $sql)) {
   if (!oci_execute($stmt)) {
     echo "Произошла непредвиденная ошибка";
   }
+  oci_free_statement($stmt);
 }
 }
 ?>

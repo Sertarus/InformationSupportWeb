@@ -23,6 +23,7 @@ if ($stmt = oci_parse($link, $sql)) {
 	else {
 		echo "Произошла непредвиденная ошибка";
 	}
+	oci_free_statement($stmt);
 }
 $sql = "select iddistrict, name from districts where deleted = '0' and iddistrict in (select district from branches_districts where deleted = '0'" . $sql_add . ")";
 if ($stmt = oci_parse($link, $sql)) {
@@ -42,5 +43,7 @@ if ($stmt = oci_parse($link, $sql)) {
 	else {
 		echo "Произошла непредвиденная ошибка";
 	}
+	oci_free_statement($stmt);
 }
+oci_close($link);
 ?>

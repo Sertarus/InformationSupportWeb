@@ -9,6 +9,6 @@ $link = oci_connect(DB_USERNAME, DB_PASSWORD, DB_SERVER, 'AL32UTF8');
  
 // Check connection
 if($link === false){
-    die("ERROR: Could not connect. " . mysqli_connect_error());
+    die("ERROR: Could not connect.");
 }
 ?>

@@ -30,6 +30,7 @@ if (filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN)) {
     else {
       echo "Произошла непредвиденная ошибка";
     }
+    oci_free_statement($stmt);
   }
 }
 
@@ -58,10 +59,6 @@ if (isset($_POST['addButton'])) {
         oci_bind_by_name($stmt, ':p2', $_GET['name']);
       }
       if (oci_execute($stmt)) {
-        if (oci_fetch($stmt)) {
-          $name_err = "Форма заполнения с таким именем уже существует";
-        }
-        else {
         $is_rec_err = false;
          $rec_arr = array();
         if ($is_human == 1) {
@@ -79,6 +76,12 @@ if (isset($_POST['addButton'])) {
       }
       }
 }
+        if (oci_fetch($stmt)) {
+          $name_err = "Форма заполнения с таким именем уже существует";
+          oci_free_statement($stmt);
+          oci_close($link);
+        }
+        else {
 $array_new = array_count_values($rec_arr);
         foreach ($array_new as $key => $value) {
           if ($value > 1) {
@@ -89,6 +92,7 @@ $array_new = array_count_values($rec_arr);
         }
 if (!$is_rec_err) {
   if (filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN)) {
+    oci_free_statement($stmt);
     $sql = "update datatypes set name = :p1, changedby = :p2, changeddate = SYSTIMESTAMP where name = :p3";
     if ($stmt = oci_parse($link, $sql)) {
       oci_bind_by_name($stmt, ':p1', $name);
@@ -97,6 +101,7 @@ if (!$is_rec_err) {
       if (!oci_execute($stmt)) {
         echo "Произошла непредвиденная ошибка";
       }
+      oci_free_statement($stmt);
     }
     $sql = "select name from recordtypes where deleted = '0' and idrecordtype in (select recordtype from datatypes_recordtypes where deleted = '0' and datatype in (select iddatatype from datatypes where name = :p1 and deleted = '0'))";
     if ($stmt = oci_parse($link, $sql)) {
@@ -113,6 +118,7 @@ if (!$is_rec_err) {
               if (!oci_execute($rec_upd_stmt)) {
                 echo "Произошла непредвиденная ошибка";
               }
+              oci_free_statement($rec_upd_stmt);
             }
           }
         }
@@ -120,6 +126,7 @@ if (!$is_rec_err) {
       else {
         echo "Произошла непредвиденная ошибка";
       }
+      oci_free_statement($stmt);
     }
     $sql = "select name from recordtypes where deleted = '0' and idrecordtype not in (select recordtype from datatypes_recordtypes where deleted = '0') and idrecordtype not in (select recordtype from recordvalues where deleted = 0)";
     if ($stmt = oci_parse($link, $sql)) {
@@ -133,12 +140,14 @@ if (!$is_rec_err) {
             if (!oci_execute($rec_upd_stmt)) {
               echo "Произошла непредвиденная ошибка";
             }
+            oci_free_statement($rec_upd_stmt);
           }
         }
       }
       else {
         echo "Произошла непредвиденная ошибка";
       }
+      oci_free_statement($stmt);
     }
     foreach ($rec_arr as $key => $value) {
       $sql = "select * from recordtypes where name = :p1 and deleted = '0'";
@@ -153,12 +162,14 @@ if (!$is_rec_err) {
               if (!oci_execute($rec_add_stmt)) {
                 echo "Произошла непредвиденная ошибка";
               }
+              oci_free_statement($rec_add_stmt);
             }
           }
         }
         else {
           echo "Произошла непредвиденная ошибка";
         }
+        oci_free_statement($stmt);
       }
       $sql = "select * from datatypes_recordtypes where deleted = '0' and datatype in (select iddatatype from datatypes where deleted = '0' and name = :p1) and recordtype in (select idrecordtype from recordtypes where deleted = '0' and name = :p2)";
       if ($stmt = oci_parse($link, $sql)) {
@@ -182,6 +193,7 @@ if (!$is_rec_err) {
                 else {
                   echo "Произошла непредвиденная ошибка";
                 }
+                oci_free_statement($datatype_id_stmt);
               }
               $recordtype_id_sql = "select idrecordtype from recordtypes where deleted = '0' and name = :p1";
               if ($recordtype_id_stmt = oci_parse($link, $recordtype_id_sql)) {
@@ -195,6 +207,7 @@ if (!$is_rec_err) {
                 else {
                   echo "Произошла непредвиденная ошибка";
                 }
+                oci_free_statement($recordtype_id_stmt);
               }
               oci_bind_by_name($rec_dat_add_stmt, ':p1', $datatype_id);
               oci_bind_by_name($rec_dat_add_stmt, ':p2', $recordtype_id);
@@ -204,6 +217,7 @@ if (!$is_rec_err) {
               if (!oci_execute($rec_dat_add_stmt)) {
                 echo "Произошла непредвиденная ошибка";
               }
+              oci_free_statement($rec_dat_add_stmt);
             }
           }
           else {
@@ -223,6 +237,7 @@ if (!$is_rec_err) {
                 else {
                   echo "Произошла непредвиденная ошибка";
                 }
+                oci_free_statement($datatype_id_stmt);
               }
               $recordtype_id_sql = "select idrecordtype from recordtypes where deleted = '0' and name = :p1";
               if ($recordtype_id_stmt = oci_parse($link, $recordtype_id_sql)) {
@@ -236,6 +251,7 @@ if (!$is_rec_err) {
                 else {
                   echo "Произошла непредвиденная ошибка";
                 }
+                oci_free_statement($recordtype_id_stmt);
               }
               $order = $key + 1;
               oci_bind_by_name($rec_dat_add_stmt, ':p1', $order);
@@ -245,6 +261,7 @@ if (!$is_rec_err) {
               if (!oci_execute($rec_dat_add_stmt)) {
                 echo "Произошла непредвиденная ошибка";
               }
+              oci_free_statement($rec_dat_add_stmt);
             }
           }
         }
@@ -263,6 +280,7 @@ if (!$is_rec_err) {
       if (!oci_execute($stmt)) {
         echo "Произошла непредвиденная ошибка";
       }
+      oci_free_statement($stmt);
     }
     foreach ($rec_arr as $key => $value) {
       $sql = "select * from recordtypes where name = :p1 and deleted = '0'";
@@ -277,12 +295,14 @@ if (!$is_rec_err) {
               if (!oci_execute($rec_add_stmt)) {
                 echo "Произошла непредвиденная ошибка";
               }
+              oci_free_statement($rec_add_stmt);
             }
           }
         }
         else {
           echo "Произошла непредвиденная ошибка";
         }
+        oci_free_statement($stmt);
       }
       $rec_dat_add_sql = "insert into datatypes_recordtypes (datatype, recordtype, dataorder, createdby, creationdate) values (:p1, :p2, :p3, :p4, SYSTIMESTAMP)";
             if ($rec_dat_add_stmt = oci_parse($link, $rec_dat_add_sql)) {
@@ -300,6 +320,7 @@ if (!$is_rec_err) {
                 else {
                   echo "Произошла непредвиденная ошибка";
                 }
+                oci_free_statement($datatype_id_stmt);
               }
               $recordtype_id_sql = "select idrecordtype from recordtypes where deleted = '0' and name = :p1";
               if ($recordtype_id_stmt = oci_parse($link, $recordtype_id_sql)) {
@@ -313,6 +334,7 @@ if (!$is_rec_err) {
                 else {
                   echo "Произошла непредвиденная ошибка";
                 }
+                oci_free_statement($recordtype_id_stmt);
               }
               $order = $key + 1;
               oci_bind_by_name($rec_dat_add_stmt, ':p1', $datatype_id);
@@ -322,9 +344,11 @@ if (!$is_rec_err) {
               if (!oci_execute($rec_dat_add_stmt)) {
                 echo "Произошла непредвиденная ошибка";
               }
+              oci_free_statement($rec_dat_add_stmt);
             }
     }
   }
+  oci_close($link);
   header("location: forms.php");
 }
   }
@@ -332,9 +356,7 @@ if (!$is_rec_err) {
       else {
         echo "Произошла непредвиденная ошибка";
       }
-      oci_free_statement($stmt);
     }
-    oci_close($link);
   }
   else {
     $name_err = "Длина названия должна быть от 1 до 40 символов";

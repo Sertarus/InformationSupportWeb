@@ -14,5 +14,7 @@ if ($stmt = oci_parse($link, $sql)) {
 	else {
 		echo "Произошла непредвиденная ошибка";
 	}
+	oci_free_statement($stmt);
 }
+oci_close($link);
 ?>
