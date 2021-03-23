@@ -80,7 +80,7 @@ if (isset($_POST['deleteButton'])) {
     <table id="devices_table" class="table table-bordered table-hover">
       <?php
         require_once "config.php";
-        $sql = "select d.name, d.createdby, TO_CHAR(d.creationdate, 'DD.MM.YYYY HH24:MI:SS') as creationdate, u.login as creator_login, u.service as creatorservice, u.district as creatordistrict from devices d join users u on u.iduser = d.createdby where d.deleted = '0'";
+        $sql = "select d.name, d.createdby, TO_CHAR(d.creationdate, 'DD.MM.YYYY HH24:MI:SS') as creationdate, u.login as creator_login, u.service as creatorservice, u.district as creatordistrict from devices d left join users u on u.iduser = d.createdby where d.deleted = '0'";
         $stmt = oci_parse($link, $sql);
         oci_define_by_name($stmt, 'NAME', $name);
         oci_define_by_name($stmt, 'CREATORSERVICE', $creator_service);

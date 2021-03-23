@@ -200,7 +200,7 @@ $sql = "delete from recordtypes where deleted = 1";
         else {
             echo "<tbody>".
         "<tr>".
-        "<td>На данный момент не создано ни одной ветки</td>".
+        "<td>На данный момент не создано ни одного объекта</td>".
         "</tr>".
         "</tbody>".
         "</table>";

@@ -7,6 +7,16 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     header("location: index.php");
     exit;
 }
+if (isset($_POST['deleteButton'])) {
+  require_once "config.php";
+  $sql = "delete from log_user_info where deleted = 1";
+  if ($stmt = oci_parse($link, $sql)) {
+  if (!oci_execute($stmt)) {
+    echo "Произошла непредвиденная ошибка";
+  }
+  oci_free_statement($stmt);
+}
+}
 ?>
 
   <!DOCTYPE html>
@@ -60,7 +70,8 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
       </div>
     </nav>
 
-
+    <?php if ($_SESSION["role"] == 2) echo "<form method='post'><input type='submit' class='btn btn-outline-danger' value='Удалить объекты с пометкой на удаление' style='float: left;' name='deleteButton'></form>"; ?>
+            
     <table class="table table-bordered table-hover">
       <?php
         require_once "config.php";

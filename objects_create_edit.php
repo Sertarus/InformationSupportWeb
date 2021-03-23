@@ -96,7 +96,7 @@ if (isset($_POST['addButton']))
         if (strcmp($key, "name") != 0 && strcmp($key, "branches") != 0 && strcmp($key, "addButton") != 0)
         {
             $replaced_key = str_replace("_", " ", $key);
-            $form_data[htmlspecialchars($replaced_key)] = htmlspecialchars($value);
+            $form_data[$replaced_key] = $value;
         }
     }
     if (mb_strlen($name) >= 1 && mb_strlen($name) <= 30)
