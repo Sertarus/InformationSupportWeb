@@ -1,7 +1,7 @@
 <?php
 // Initialize the session
 session_start();
- 
+
 // Check if the user is logged in, if not then redirect him to login page
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     header("location: index.php");
@@ -63,7 +63,7 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
   </body>
   <?php
   require_once "config.php";
-  $sql = "select name, ishuman, d.createdby, TO_CHAR(d.creationdate, 'DD.MM.YYYY HH24:MI:SS') as creationdate, d.changedby, TO_CHAR(d.changeddate, 'DD.MM.YYYY HH24:MI:SS') as changeddate, u.login as createdbyname, us.login as changedbyname from datatypes d left join users u on u.iduser = d.createdby left join users us on us.iduser = d.changedby where name = :p1";
+  $sql = "select name, ishuman, d.createdby, TO_CHAR(d.creationdate, 'DD.MM.YYYY HH24:MI:SS') as creationdate, d.changedby, TO_CHAR(d.changeddate, 'DD.MM.YYYY HH24:MI:SS') as changeddate, u.login as createdbyname, us.login as changedbyname from datatypes d left join users u on u.iduser = d.createdby left join users us on us.iduser = d.changedby where name = :p1 and d.deleted = '0'";
   if ($stmt = oci_parse($link, $sql)) {
     oci_bind_by_name($stmt, ':p1', $_GET["name"]);
     oci_define_by_name($stmt, 'NAME', $name);
@@ -81,8 +81,8 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
         $is_human_string = "Да";
       }
       echo "<div class='parent'><ul>".
-       "<li><b>Название: </b>" . $name. "</li>" . 
-       "<li><b>Информация о человеке: </b>" . $is_human_string. "</li>" . 
+       "<li><b>Название: </b>" . $name. "</li>" .
+       "<li><b>Информация о человеке: </b>" . $is_human_string. "</li>" .
       "<li><b>Создавший пользователь: </b>" . $createdby. "</li>" .
       "<li><b>Дата создания: </b>" . $creationdate . "</li>";
       if (!is_null($changedby) && !is_null($changeddate)) {

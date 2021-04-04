@@ -1,7 +1,7 @@
 <?php
 // Initialize the session
 session_start();
- 
+
 // Check if the user is logged in, if not then redirect him to login page
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     header("location: index.php");
@@ -63,7 +63,7 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
   </body>
   <?php
   require_once "config.php";
-  $sql = "select u.login, u.fullname, u.role, u.email, u.phonenumber, s.name as service, d.name as district, dev.name as device, u.blocked, u.createdby, TO_CHAR(u.creationdate, 'DD.MM.YYYY HH24:MI:SS') as creationdate, u.changedby, TO_CHAR(u.changeddate, 'DD.MM.YYYY HH24:MI:SS') as changeddate, us.login as createdbyname, use.login as changedbyname from users u left join users us on us.iduser = u.createdby left join users use on use.iduser = u.changedby join services s on s.idservice = u.service join districts d on d.iddistrict = u.district join devices dev on dev.iddevice = u.device where u.login = :p1";
+  $sql = "select u.login, u.fullname, u.role, u.email, u.phonenumber, s.name as service, d.name as district, dev.name as device, u.blocked, u.createdby, TO_CHAR(u.creationdate, 'DD.MM.YYYY HH24:MI:SS') as creationdate, u.changedby, TO_CHAR(u.changeddate, 'DD.MM.YYYY HH24:MI:SS') as changeddate, us.login as createdbyname, use.login as changedbyname from users u left join users us on us.iduser = u.createdby left join users use on use.iduser = u.changedby join services s on s.idservice = u.service join districts d on d.iddistrict = u.district join devices dev on dev.iddevice = u.device where u.login = :p1 and u.deleted = '0'";
   if ($stmt = oci_parse($link, $sql)) {
     oci_bind_by_name($stmt, ':p1', $_GET["name"]);
     oci_define_by_name($stmt, 'LOGIN', $name);

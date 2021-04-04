@@ -1,12 +1,13 @@
 <?php
 // Initialize the session
 session_start();
- 
+
 // Check if the user is logged in, if not then redirect him to login page
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     header("location: index.php");
     exit;
 }
+
 if (isset($_POST['deleteButton'])) {
   require_once "config.php";
   $sql = "delete from log_user_info where deleted = 1";
@@ -18,6 +19,7 @@ if (isset($_POST['deleteButton'])) {
 }
 }
 ?>
+
 
   <!DOCTYPE html>
   <html lang="en">
@@ -70,8 +72,10 @@ if (isset($_POST['deleteButton'])) {
       </div>
     </nav>
 
-    <?php if ($_SESSION["role"] == 2) echo "<form method='post'><input type='submit' class='btn btn-outline-danger' value='Удалить объекты с пометкой на удаление' style='float: left;' name='deleteButton'></form>"; ?>
-            
+    <form method="post">
+                <?php if ($_SESSION["role"] == 2) echo "<input type='submit' class='btn btn-outline-danger' value='Удалить объекты с пометкой на удаление' style='float: left;' name='deleteButton'>"; ?>
+            </form>
+
     <table class="table table-bordered table-hover">
       <?php
         require_once "config.php";

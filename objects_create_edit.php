@@ -114,7 +114,7 @@ if (isset($_POST['addButton']))
                 if ($info['mime'] == 'image/jpeg') {
                     $new_image = imagecreatefromjpeg($image);
                     imagejpeg($new_image, "tmpimage.jpg", 50);
-                } 
+                }
 
                 elseif ($info['mime'] == 'image/png') {
                     $new_image = imagecreatefrompng($image);
@@ -125,8 +125,8 @@ $white = imagecolorallocate($output,  255, 255, 255);
 imagefilledrectangle($output, 0, 0, $width, $height, $white);
 imagecopy($output, $new_image, 0, 0, 0, 0, $width, $height);
 imagejpeg($output, "tmpimage.jpg", 50);
-                }  
-                
+                }
+
                 $image = "tmpimage.jpg";
             }
             if (is_null($image) || filesize($image) <= 5000000)
@@ -174,7 +174,7 @@ imagejpeg($output, "tmpimage.jpg", 50);
                                     }
                                     oci_free_statement($stmt);
                                     if ($stmt = oci_parse($link, $sql))
-                                        
+
                                     {
                                         oci_bind_by_name($stmt, ':p1', $name);
                                         if (!is_null($image)) {
@@ -182,7 +182,7 @@ imagejpeg($output, "tmpimage.jpg", 50);
                                             oci_bind_by_name($stmt, ':p2', $lob, -1, OCI_B_BLOB);
                                             $image_input = file_get_contents("tmpimage.jpg");
                                         }
-                                        
+
                                         oci_bind_by_name($stmt, ':p3', $_SESSION['iduser']);
                                         oci_bind_by_name($stmt, ':p4', $_GET['name']);
                                         if (!oci_execute($stmt, OCI_DEFAULT))
@@ -231,10 +231,10 @@ imagejpeg($output, "tmpimage.jpg", 50);
                                     else {
                                         $sql = "insert into dataobjects (name, branch, image, createdby, creationdate) values (:p1, :p2, :p3, :p4, SYSTIMESTAMP)";
                                     }
-                                    
+
                                     if ($stmt = oci_parse($link, $sql))
                                     {
-                                        
+
                                         oci_bind_by_name($stmt, ':p1', $name);
                                         if (is_null($image))
                                         {
@@ -248,7 +248,7 @@ imagejpeg($output, "tmpimage.jpg", 50);
                                             oci_bind_by_name($stmt, ':p3', $lob, -1, OCI_B_BLOB);
                                         }
                                         oci_bind_by_name($stmt, ':p2', $branch);
-                                        
+
                                         oci_bind_by_name($stmt, ':p4', $_SESSION['iduser']);
                                         if (!oci_execute($stmt, OCI_DEFAULT))
                                         {
@@ -261,7 +261,7 @@ imagejpeg($output, "tmpimage.jpg", 50);
                                         else {
                                             oci_commit($link);
                                         }
-                                        $lob->free();   
+                                        $lob->free();
                                         }
                                         oci_free_statement($stmt);
                                     }
@@ -339,7 +339,7 @@ imagejpeg($output, "tmpimage.jpg", 50);
                 {
                     $name_err = "Длина значения каждого реквизита должна быть от 1 до 150 символов";
                 }
-                
+
             }
             else
             {
