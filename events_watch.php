@@ -50,6 +50,7 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
               <li><a class="dropdown-item" href="forms.php">Формы заполнения</a></li>
               <li><a class="dropdown-item" href="objects.php">Объекты данных</a></li>
               <li><a class="dropdown-item" href="events.php">Мероприятия</a></li>
+              <li><a class="dropdown-item" href="suggestions.php">Запросы на изменение данных</a></li>
             </ul>
           </li>
             <li class="nav-item">
