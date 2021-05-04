@@ -1,7 +1,7 @@
 <?php
 // Initialize the session
 session_start();
- 
+
 // Check if the user is logged in, if not then redirect him to login page
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     header("location: index.php");
@@ -42,7 +42,7 @@ if (filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN)) {
           if (oci_execute($serv_stmt)) {
             while (oci_fetch($serv_stmt)) {
               $services[] = $current_service;
-            } 
+            }
           }
           else {
             echo "Произошла непредвиденная ошибка";
@@ -64,11 +64,11 @@ if (filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN)) {
           oci_free_statement($dist_stmt);
         }
       }
-    } 
+    }
     else {
       echo "Произошла непредвиденная ошибка";
     }
-    oci_free_statement($stmt);   
+    oci_free_statement($stmt);
   }
 }
 
@@ -300,7 +300,7 @@ if (isset($_POST['addButton'])) {
               else {
                 $name_err = "Дата окончания не установлена";
               }
-            } 
+            }
             else {
               $name_err = "Дата начала не установлена";
             }
@@ -364,21 +364,33 @@ if (isset($_POST['addButton'])) {
       </div>
     </nav>
     <?php
-    $additional_datetime_string = "onfocus=(this.type='datetime-local') onblur=(if (this.value == '') {this.type='text'})";
     $type = "text";
     if (filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN) || isset($_POST['addButton'])) {
-      $additional_datetime_string = "";
       $type = "datetime-local";
-    } 
+    }
       echo "<form method='post'><div class='form-group w-25 mx-auto m-4'>
       <div class='form-group'>
         <input type='text' class='form-control' name='name' placeholder='Название' value='". $name . "'>
         <span class='help-block'>". $name_err . "</span>
         </div>
-        <div class='form-group'><input type='". $type . "' class='form-control' " . $additional_datetime_string . " name='timestart' placeholder='Время начала' value='". $datetime_start . "'></div>
-        <div class='form-group'><input type='" . $type . "' class='form-control' " . $additional_datetime_string . " name='timeend' placeholder='Время окончания' value='". $datetime_end . "'></div>
-        <div class='form-group'><textarea class='form-control' name='description' placeholder='Описание'>" . $description . "</textarea></div>";
-        echo "<div id='txthint'><div class='form-group'><select id='services' name='services[]' class='selectpicker' title='Ничего не выбрано' multiple>";
+        <div class='form-group'><input type='". $type . "' class='form-control' id='timestart' name='timestart' placeholder='Время начала' value='". $datetime_start . "'></div>
+        <div class='form-group'><input type='" . $type . "' class='form-control' id='timeend' name='timeend' placeholder='Время окончания' value='". $datetime_end . "'></div>
+        <div class='form-group'><textarea class='form-control' name='description' placeholder='Описание'>" . $description . "</textarea></div>
+        <div id='txthint'><div class='form-group'><select id='services' name='services[]' class='selectpicker' title='Ничего не выбрано' multiple>";
+            if (!filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN) && !isset($_POST['addButton'])) {
+      echo "<script>
+  var dtt = document.getElementById('timestart')
+  dtt.onfocus = function (event) {
+      this.type = 'datetime-local';
+      this.focus();
+  }
+  var dtt2 = document.getElementById('timeend')
+  dtt2.onfocus = function (event) {
+      this.type = 'datetime-local';
+      this.focus();
+  }
+</script>";
+    }
         require_once "config.php";
         $sql = "select idservice, name from services where deleted = '0'";
             if ($stmt = oci_parse($link, $sql))
@@ -433,11 +445,11 @@ if (isset($_POST['addButton'])) {
                 oci_free_statement($stmt);
             }
             echo "</select></div></div>";
-          
+
             $addButton_name = "Создать мероприятие";
            if (filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN)) {
             $addButton_name = "Изменить мероприятие";
-           } 
+           }
       echo "</div>
                 <input type='submit' class='btn btn-primary' value='" . $addButton_name . "' name='addButton'>
             </form>";

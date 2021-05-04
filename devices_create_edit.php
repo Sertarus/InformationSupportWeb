@@ -1,7 +1,7 @@
 <?php
 // Initialize the session
 session_start();
- 
+
 // Check if the user is logged in, if not then redirect him to login page
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     header("location: index.php");
@@ -114,7 +114,7 @@ if (isset($_POST['addButton'])) {
         </div>
       </div>
     </nav>
-    <?php 
+    <?php
     if (filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN)) {
       echo "<form method='post'><div class='form-group w-25 mx-auto m-4'>
         <input type='text' class='form-control' name='name' placeholder='Название' value='". $name . "'>
@@ -130,7 +130,7 @@ if (isset($_POST['addButton'])) {
         <span class='help-block'>" . $name_err . "</span>
       </div>
 
-                <input type='submit' class='btn btn-primary' value='Создать устрйоство' name='addButton'>
+                <input type='submit' class='btn btn-primary' value='Создать устройство' name='addButton'>
             </form>";
     }
     ?>
