@@ -167,10 +167,10 @@ imagejpeg($output, "tmpimage.jpg", 50);
                                 if (filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN))
                                 {
                                     if (is_null($image)) {
-                                        $sql = "update dataobjects set name = :p1, changedby = :p3, changeddate = SYSTIMESTAMP where name = :p4";
+                                        $sql = "update dataobjects set name = :p1, changedby = :p3, changeddate = SYSTIMESTAMP where name = :p4 and deleted = 0";
                                     }
                                     else {
-                                        $sql = "update dataobjects set name = :p1, image = EMPTY_BLOB(), changedby = :p3, changeddate = SYSTIMESTAMP where name = :p4 returning image into :p2";
+                                        $sql = "update dataobjects set name = :p1, image = EMPTY_BLOB(), changedby = :p3, changeddate = SYSTIMESTAMP where name = :p4 and deleted = 0 returning image into :p2";
                                     }
                                     oci_free_statement($stmt);
                                     if ($stmt = oci_parse($link, $sql))
@@ -209,9 +209,10 @@ imagejpeg($output, "tmpimage.jpg", 50);
                                                 $sql = "update recordvalues set value = :p1, changedby = :p2, changeddate = SYSTIMESTAMP where deleted = '0' and recordtype in (select idrecordtype from recordtypes where name = :p3 and deleted = '0') and dataobject in (select iddataobject from dataobjects where deleted = '0' and name = :p4)";
                                                 if ($stmt = oci_parse($link, $sql))
                                                 {
-                                                    oci_bind_by_name($stmt, ':p1', htmlspecialchars($value));
+                                                    $key_replaced = str_replace("_", " ", $key);
+                                                    oci_bind_by_name($stmt, ':p1', $value);
                                                     oci_bind_by_name($stmt, ':p2', $_SESSION['iduser']);
-                                                    oci_bind_by_name($stmt, ':p3', $key);
+                                                    oci_bind_by_name($stmt, ':p3', $key_replaced);
                                                     oci_bind_by_name($stmt, ':p4', $name);
                                                     if (!oci_execute($stmt))
                                                     {
@@ -320,13 +321,14 @@ imagejpeg($output, "tmpimage.jpg", 50);
                                         }
                                     }
                                 }
+                                oci_close($link);
+                            header("location: objects.php");
                             }
 
                             else
                             {
                                 "Объект данных с таким именем уже существует";
                             }
-                            header("location: objects.php");
                         }
                         else
                         {
@@ -359,6 +361,7 @@ imagejpeg($output, "tmpimage.jpg", 50);
     {
         $name_err = "Длина названия должна быть от 1 до 30 символов";
     }
+    oci_close($link);
 }
 
 ?>
