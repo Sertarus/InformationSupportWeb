@@ -378,20 +378,6 @@ if (isset($_POST['addButton'])) {
         <div class='form-group'><input type='" . $type . "' class='form-control' id='timeend' name='timeend' placeholder='Время окончания' value='". $datetime_end . "'></div>
         <div class='form-group'><textarea class='form-control' name='description' placeholder='Описание'>" . $description . "</textarea></div>
         <div id='txthint'><div class='form-group'><select id='services' name='services[]' class='selectpicker' title='Ничего не выбрано' multiple>";
-            if (!filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN) && !isset($_POST['addButton'])) {
-      echo "<script>
-  var dtt = document.getElementById('timestart')
-  dtt.onfocus = function (event) {
-      this.type = 'datetime-local';
-      this.focus();
-  }
-  var dtt2 = document.getElementById('timeend')
-  dtt2.onfocus = function (event) {
-      this.type = 'datetime-local';
-      this.focus();
-  }
-</script>";
-    }
         require_once "config.php";
         $sql = "select idservice, name from services where deleted = '0'";
             if ($stmt = oci_parse($link, $sql))
@@ -455,6 +441,20 @@ if (isset($_POST['addButton'])) {
                 <input type='submit' class='btn btn-primary' value='" . $addButton_name . "' name='addButton'>
             </form>";
             oci_close($link);
+            if (!filter_var($_GET["isEdit"], FILTER_VALIDATE_BOOLEAN) && !isset($_POST['addButton'])) {
+      echo "<script>
+  var dtt = document.getElementById('timestart')
+  dtt.onfocus = function (event) {
+      this.type = 'datetime-local';
+      this.focus();
+  }
+  var dtt2 = document.getElementById('timeend')
+  dtt2.onfocus = function (event) {
+      this.type = 'datetime-local';
+      this.focus();
+  }
+</script>";
+    }
     ?>
     <script src="js/bootstrap.min.js"></script>
   </body>
