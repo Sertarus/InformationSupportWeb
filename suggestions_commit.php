@@ -38,6 +38,17 @@ $sql = "select image, dataobject from dataobjects_suggested where idsuggested = 
         }
         oci_free_statement($image_stmt);
       }
+      else {
+      	$do_sql = "update dataobjects set changedby = :p1, changeddate = SYSTIMESTAMP where iddataobject = :p2 and deleted = 0";
+      	if ($do_stmt = oci_parse($link, $do_sql)) {
+      		oci_bind_by_name($do_stmt, ':p1', $_SESSION["iduser"]);
+      		oci_bind_by_name($do_stmt, ':p2', $dataobject);
+      		if(!oci_execute($do_stmt)) {
+      			echo "Произошла непредвиденная ошибка";
+      		}
+      		oci_free_statement($do_stmt);
+      	}
+      }
     }
     else {
       echo "Произошла непредвиденная ошибка";
