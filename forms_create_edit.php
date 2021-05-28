@@ -430,7 +430,7 @@ if (!$is_rec_err) {
       }
       echo "<br><b>Реквизиты:</b><br><br>";
       foreach ($rec_arr as $key => $value) {
-        if (strcmp($value, "ФИО") != 0 && strcmp($value, "Дата рождения") != 0 && strcmp($value, "Описание") != 0) {
+        if (strcmp($value, "ФИО") != 0 && strcmp($value, "Дата рождения") != 0 && (strcmp($value, "Описание") != 0 || strcmp($is_human, "0") == 0)) {
           $num = $key + 1;
         echo "<div class = 'form-group'><div class='input-group'><input type='text' class='form-control' name = 'rec" . $num . "' placeholder = 'Реквизит " . $num . "' value = '" . $value . "'><span class='input-group-btn'><button id = 'del" . $num . "' type='button' class='btn btn-danger'><i class='fa fa-trash'></i></button></span></div></div>";
         }
