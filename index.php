@@ -35,7 +35,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(empty($username_err) && empty($password_err)){
     	require_once "config.php";
         // Prepare a select statement
-        $sql = "SELECT iduser, login, password, role, service, district FROM users WHERE login = :p1";
+        $sql = "SELECT iduser, login, password, role, service, district FROM users WHERE login = :p1 and deleted = 0";
         
         if($stmt = oci_parse($link, $sql)){
             // Bind variables to the prepared statement as parameters

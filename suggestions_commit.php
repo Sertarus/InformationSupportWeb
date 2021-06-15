@@ -16,6 +16,39 @@ $sql = "select image, dataobject from dataobjects_suggested where idsuggested = 
     if (oci_execute($stmt)) {
       oci_fetch($stmt);
       if (!is_null($image)) {
+        $image_sql = "select image from dataobjects where iddataobject = :p1 and deleted = 0";
+                                        if ($image_stmt = oci_parse($link, $image_sql)) {
+                                            oci_bind_by_name($image_stmt, ':p1', $dataobject);
+                                            oci_define_by_name($image_stmt, 'IMAGE', $old_image);
+                                            if (oci_execute($image_stmt)) {
+                                                if (oci_fetch($image_stmt)) {
+                                                if (!is_null($old_image)) {
+                                                $add_old_image_sql = "insert into old_images (image, dataobject, createdby, creationdate) values (EMPTY_BLOB(), :p2, :p3, SYSTIMESTAMP) returning image into :p1";
+                                                if ($add_old_image_stmt = oci_parse($link, $add_old_image_sql)) {
+                                                    $lob = oci_new_descriptor($link, OCI_D_LOB);
+                                                    oci_bind_by_name($add_old_image_stmt, ':p1', $lob, -1, OCI_B_BLOB);
+                                                    oci_bind_by_name($add_old_image_stmt, ':p2', $dataobject);
+                                                    oci_bind_by_name($add_old_image_stmt, ':p3', $_SESSION['iduser']);
+                                                    if (!oci_execute($add_old_image_stmt, OCI_DEFAULT)) {
+                                                        echo "Произошла непредвиденная ошибка";
+                                                    }
+                                                    if (!$lob ->save($old_image -> load())) {
+                                                    oci_rollback($link);
+                                                    }
+                                                    else {
+                                                        oci_commit($link);
+                                                    }
+                                                    $lob->free();
+                                                }
+                                                oci_free_statement($add_old_image_stmt);
+                                            }
+                                        }
+                                        }
+                                            else {
+                                                echo "Произошла непредвиденная ошибка";
+                                            }
+                                        }
+                                        oci_free_statement($image_stmt);
         $image_sql = "update dataobjects set image = EMPTY_BLOB(), changedby = :p2, changeddate = SYSTIMESTAMP where iddataobject = :p3 and deleted = 0 returning image into :p1";
         if ($image_stmt = oci_parse($link, $image_sql)) {
         	$lob = oci_new_descriptor($link, OCI_D_LOB);

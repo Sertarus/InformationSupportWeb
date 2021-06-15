@@ -26,6 +26,15 @@ if ($stmt = oci_parse($link, $sql)) {
 	}
 }
 oci_free_statement($stmt);
+$sql = "update old_images set changedby = :p1, changeddate = SYSTIMESTAMP, deleted = 1 where deleted = 0 and dataobject in (select iddataobject from dataobjects where name = :p2)";
+if ($stmt = oci_parse($link, $sql)) {
+  oci_bind_by_name($stmt, ':p1', $_SESSION["iduser"]);
+  oci_bind_by_name($stmt, ':p2', $_GET["name"]);
+  if (!oci_execute($stmt)) {
+    echo "Произошла непредвиденная ошибка";
+  }
+}
+oci_free_statement($stmt);
 $sql = "select name from recordtypes where deleted = '0' and idrecordtype not in (select recordtype from datatypes_recordtypes where deleted = '0') and idrecordtype not in (select recordtype from recordvalues where deleted = 0)";
 if ($stmt = oci_parse($link, $sql)) {
       oci_define_by_name($stmt, 'NAME', $rec_name);
@@ -47,6 +56,7 @@ if ($stmt = oci_parse($link, $sql)) {
       }
     }
     oci_free_statement($stmt);
+
 oci_close($link);
 header("location: objects.php");
 exit;

@@ -170,6 +170,40 @@ imagejpeg($output, "tmpimage.jpg", 50);
                                         $sql = "update dataobjects set name = :p1, changedby = :p3, changeddate = SYSTIMESTAMP where name = :p4 and deleted = 0";
                                     }
                                     else {
+                                        $image_sql = "select image, iddataobject from dataobjects where name = :p1 and deleted = 0";
+                                        if ($image_stmt = oci_parse($link, $image_sql)) {
+                                            oci_bind_by_name($image_stmt, ':p1', $_GET['name']);
+                                            oci_define_by_name($image_stmt, 'IMAGE', $old_image);
+                                            oci_define_by_name($image_stmt, 'IDDATAOBJECT', $old_id);
+                                            if (oci_execute($image_stmt)) {
+                                                if (oci_fetch($image_stmt)) {
+                                                if (!is_null($old_image)) {
+                                                $add_old_image_sql = "insert into old_images (image, dataobject, createdby, creationdate) values (EMPTY_BLOB(), :p2, :p3, SYSTIMESTAMP) returning image into :p1";
+                                                if ($add_old_image_stmt = oci_parse($link, $add_old_image_sql)) {
+                                                    $lob = oci_new_descriptor($link, OCI_D_LOB);
+                                                    oci_bind_by_name($add_old_image_stmt, ':p1', $lob, -1, OCI_B_BLOB);
+                                                    oci_bind_by_name($add_old_image_stmt, ':p2', $old_id);
+                                                    oci_bind_by_name($add_old_image_stmt, ':p3', $_SESSION['iduser']);
+                                                    if (!oci_execute($add_old_image_stmt, OCI_DEFAULT)) {
+                                                        echo "Произошла непредвиденная ошибка";
+                                                    }
+                                                    if (!$lob ->save($old_image -> load())) {
+                                                    oci_rollback($link);
+                                                    }
+                                                    else {
+                                                        oci_commit($link);
+                                                    }
+                                                    $lob->free();
+                                                }
+                                                oci_free_statement($add_old_image_stmt);
+                                            }
+                                        }
+                                        }
+                                            else {
+                                                echo "Произошла непредвиденная ошибка";
+                                            }
+                                        }
+                                        oci_free_statement($image_stmt);
                                         $sql = "update dataobjects set name = :p1, image = EMPTY_BLOB(), changedby = :p3, changeddate = SYSTIMESTAMP where name = :p4 and deleted = 0 returning image into :p2";
                                     }
                                     oci_free_statement($stmt);

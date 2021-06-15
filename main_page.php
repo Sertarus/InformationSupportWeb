@@ -17,6 +17,139 @@ if (isset($_POST['deleteButton'])) {
   }
   oci_free_statement($stmt);
 }
+$sql = "delete from services where deleted = 1";
+  if ($stmt = oci_parse($link, $sql)) {
+  if (!oci_execute($stmt)) {
+    echo "Произошла непредвиденная ошибка";
+  }
+}
+  oci_free_statement($stmt);
+  $sql = "delete from districts where deleted = 1";
+  if ($stmt = oci_parse($link, $sql)) {
+  if (!oci_execute($stmt)) {
+    echo "Произошла непредвиденная ошибка";
+  }
+}
+  oci_free_statement($stmt);
+  $sql = "delete from devices where deleted = 1";
+  if ($stmt = oci_parse($link, $sql)) {
+  if (!oci_execute($stmt)) {
+    echo "Произошла непредвиденная ошибка";
+  }
+}
+  oci_free_statement($stmt);
+  $sql = "delete from users where deleted = 1";
+  if ($stmt = oci_parse($link, $sql)) {
+  if (!oci_execute($stmt)) {
+    echo "Произошла непредвиденная ошибка";
+  }
+}
+  oci_free_statement($stmt);
+  $sql = "delete from dataobjects where deleted = 1";
+  if ($stmt = oci_parse($link, $sql)) {
+  if (!oci_execute($stmt)) {
+    echo "Произошла непредвиденная ошибка";
+  }
+}
+  oci_free_statement($stmt);
+  $sql = "delete from datatypes where deleted = 1";
+  if ($stmt = oci_parse($link, $sql)) {
+  if (!oci_execute($stmt)) {
+    echo "Произошла непредвиденная ошибка";
+  }
+}
+  oci_free_statement($stmt);
+  $sql = "delete from recordtypes where deleted = 1";
+  if ($stmt = oci_parse($link, $sql)) {
+  if (!oci_execute($stmt)) {
+    echo "Произошла непредвиденная ошибка";
+  }
+}
+  oci_free_statement($stmt);
+  $sql = "delete from recordvalues where deleted = 1";
+  if ($stmt = oci_parse($link, $sql)) {
+  if (!oci_execute($stmt)) {
+    echo "Произошла непредвиденная ошибка";
+  }
+}
+  oci_free_statement($stmt);
+  $sql = "delete from branches where deleted = 1";
+  if ($stmt = oci_parse($link, $sql)) {
+  if (!oci_execute($stmt)) {
+    echo "Произошла непредвиденная ошибка";
+  }
+}
+  oci_free_statement($stmt);
+  $sql = "delete from events where deleted = 1";
+  if ($stmt = oci_parse($link, $sql)) {
+  if (!oci_execute($stmt)) {
+    echo "Произошла непредвиденная ошибка";
+  }
+}
+  oci_free_statement($stmt);
+  $sql = "delete from messages where deleted = 1";
+  if ($stmt = oci_parse($link, $sql)) {
+  if (!oci_execute($stmt)) {
+    echo "Произошла непредвиденная ошибка";
+  }
+}
+  oci_free_statement($stmt);
+  $sql = "delete from dataobjects_suggested where deleted = 1";
+  if ($stmt = oci_parse($link, $sql)) {
+  if (!oci_execute($stmt)) {
+    echo "Произошла непредвиденная ошибка";
+  }
+}
+  oci_free_statement($stmt);
+  $sql = "delete from recordvalues_suggested where deleted = 1";
+  if ($stmt = oci_parse($link, $sql)) {
+  if (!oci_execute($stmt)) {
+    echo "Произошла непредвиденная ошибка";
+  }
+}
+  oci_free_statement($stmt);
+$sql = "delete from branches_districts where deleted = 1";
+  if ($stmt = oci_parse($link, $sql)) {
+  if (!oci_execute($stmt)) {
+    echo "Произошла непредвиденная ошибка";
+  }
+  oci_free_statement($stmt);
+}
+$sql = "delete from branches_services where deleted = 1";
+  if ($stmt = oci_parse($link, $sql)) {
+  if (!oci_execute($stmt)) {
+    echo "Произошла непредвиденная ошибка";
+  }
+  oci_free_statement($stmt);
+}
+$sql = "delete from datatypes_recordtypes where deleted = 1";
+  if ($stmt = oci_parse($link, $sql)) {
+  if (!oci_execute($stmt)) {
+    echo "Произошла непредвиденная ошибка";
+  }
+  oci_free_statement($stmt);
+}
+$sql = "delete from events_districts where deleted = 1";
+  if ($stmt = oci_parse($link, $sql)) {
+  if (!oci_execute($stmt)) {
+    echo "Произошла непредвиденная ошибка";
+  }
+  oci_free_statement($stmt);
+}
+$sql = "delete from events_services where deleted = 1";
+  if ($stmt = oci_parse($link, $sql)) {
+  if (!oci_execute($stmt)) {
+    echo "Произошла непредвиденная ошибка";
+  }
+  oci_free_statement($stmt);
+}
+$sql = "delete from old_images where deleted = 1";
+  if ($stmt = oci_parse($link, $sql)) {
+  if (!oci_execute($stmt)) {
+    echo "Произошла непредвиденная ошибка";
+  }
+  oci_free_statement($stmt);
+}
 }
 ?>
 
