@@ -90,7 +90,7 @@ $sql = "delete from branches_services where deleted = 1";
     </nav>
 
     <form method="post">
-                <input type="submit" class="btn btn-outline-primary" value="Добавить форму" style="float: right;" name="addButton">
+                <input type="submit" class="btn btn-outline-primary" value="Добавить ветку" style="float: right;" name="addButton">
                 <?php if ($_SESSION["role"] == 2) echo "<input type='submit' class='btn btn-outline-danger' value='Удалить объекты с пометкой на удаление' style='float: left;' name='deleteButton'>"; ?>
             </form>
     <table id="branches_table" class="table table-bordered table-hover">
