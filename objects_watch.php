@@ -81,8 +81,22 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
       oci_fetch($stmt);
       $dataobject_id = $id;
       if (!is_null($image)) {
-        echo "<div class='row m-2'><div class='col-sm-auto m-2'>";
+        echo "<div class='row'><div class='col-sm-auto m-2'><div class='row m-3'>";
         echo '<img src="data:image/jpeg;base64,'.base64_encode($image -> load()).'" width ="300" height="300"/>';
+        echo "</div>";
+        $old_sql = "select image, creationdate from old_images where dataobject = :p1 and deleted = 0 order by creationdate desc";
+        if ($old_stmt = oci_parse($link, $old_sql)) {
+        	oci_bind_by_name($old_stmt, ':p1', $id);
+        	oci_define_by_name($old_stmt, 'IMAGE', $old_image);
+        	if (oci_execute($old_stmt)) {
+        		while (oci_fetch($old_stmt)) {
+        			echo '<div class="row m-3"><img src="data:image/jpeg;base64,'.base64_encode($old_image -> load()).'" width ="300" height="300"/></div>';
+        		}
+        	}
+        	else {
+        		echo "Произошла непредвиденная  ошибка";
+        	}
+        }
         echo "</div>";
       }
       echo "<div class = 'col'>";
